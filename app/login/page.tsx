@@ -39,12 +39,14 @@ export default function LoginPage() {
 
       // Redirect based on user role
       const redirectPath =
-        data.user.role === "student"
-          ? "/student/dashboard"
-          : data.user.role === "staff"
-          ? "/staff/dashboard"
-          : "/admin/dashboard";
-
+  data.user.role === "student"
+    ? "/student/dashboard"
+    : data.user.role === "staff"
+    ? "/staff/dashboard"
+    : data.user.role === "parent"
+    ? "/parent/dashboard"
+    : "/admin/dashboard";
+    
       router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
