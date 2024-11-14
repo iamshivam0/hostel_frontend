@@ -54,11 +54,13 @@ export default function RegisterPage() {
       // Redirect to dashboard
       // Redirect based on user role
       const redirectPath =
-        data.user.role === "student"
-          ? "/student/dashboard"
-          : data.user.role === "staff"
-          ? "/staff/dashboard"
-          : "/admin/dashboard";
+  data.user.role === "student"
+    ? "/student/dashboard"
+    : data.user.role === "staff"
+    ? "/staff/dashboard"
+    : data.user.role === "parent"
+    ? "/parent/dashboard"
+    : "/admin/dashboard";
 
       router.push(redirectPath);
     } catch (err) {
@@ -180,6 +182,7 @@ export default function RegisterPage() {
               >
                 <option value="student">Student</option>
                 <option value="staff">Staff</option>
+                <option value="parent">Parent</option>
               </select>
             </div>
           </div>
