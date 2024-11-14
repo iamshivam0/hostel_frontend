@@ -8,21 +8,18 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Navigation Bar */}
-      <nav className="bg-white dark:bg-gray-900 shadow-lg">
+      <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
                 HMS
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700"
-              >
+              <button onClick={toggleTheme} className="p-2 rounded-lg ">
                 {theme === "dark" ? "🌞" : "🌙"}
               </button>
               <div className="flex items-center gap-2">
@@ -45,31 +42,33 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-            <span className="block">Welcome to</span>
-            <span className="block text-blue-600 dark:text-blue-400">
-              Hostel Management System
-            </span>
-          </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Streamline your hostel operations with our comprehensive management
-            system. Manage rooms, students, and staff all in one place.
-          </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent dark:from-blue-950/30 dark:to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 relative">
+          <div className="text-center space-y-8">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight">
+              <span className="block text-gray-900 dark:text-white mb-4">
+                Welcome to
+              </span>
+              <span className="block bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text leading-normal pb-2">
+                Hostel Management System
+              </span>
+            </h1>
+            <p className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Streamline your hostel operations with our comprehensive
+              management system. Manage rooms, students, and staff all in one
+              place.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 md:py-4 md:text-lg md:px-10"
+                className="px-8 py-4 text-lg font-medium rounded-xl bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
               >
                 Get Started
               </Link>
-            </div>
-            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
               <Link
                 href="/about"
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-gray-600 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 md:py-4 md:text-lg md:px-10"
+                className="px-8 py-4 text-lg font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-lg border border-gray-200 dark:border-gray-700"
               >
                 Learn More
               </Link>
@@ -79,12 +78,12 @@ export default function Home() {
       </div>
 
       {/* Feature Section */}
-      <div className="bg-white dark:bg-gray-900 py-16">
+      <div className="py-24 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
             {/* Feature 1 */}
-            <div className="text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 dark:bg-blue-400 text-white mx-auto">
+            <div className="group hover:scale-105 transition-all duration-200 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-xl dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-400 text-white mx-auto shadow-lg shadow-blue-500/30">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -99,17 +98,18 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
                 Room Management
               </h3>
-              <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
-                Efficiently manage room allocations and maintenance schedules.
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-center leading-relaxed">
+                Efficiently manage room allocations and maintenance schedules
+                with our intuitive interface.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 dark:bg-blue-400 text-white mx-auto">
+            <div className="group hover:scale-105 transition-all duration-200 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-xl dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-400 text-white mx-auto shadow-lg shadow-blue-500/30">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -124,17 +124,18 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
                 Student Management
               </h3>
-              <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
-                Keep track of student records, payments, and attendance.
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-center leading-relaxed">
+                Keep track of student records, payments, and attendance with our
+                user-friendly platform.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="text-center">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 dark:bg-blue-400 text-white mx-auto">
+            <div className="group hover:scale-105 transition-all duration-200 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-xl dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-400 text-white mx-auto shadow-lg shadow-blue-500/30">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -149,11 +150,12 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white text-center">
                 Staff Management
               </h3>
-              <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
-                Manage staff schedules, roles, and responsibilities.
+              <p className="mt-4 text-gray-600 dark:text-gray-300 text-center leading-relaxed">
+                Manage staff schedules, roles, and responsibilities with our
+                efficient system.
               </p>
             </div>
           </div>
@@ -161,9 +163,9 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-base text-gray-500 dark:text-gray-400">
+          <p className="text-center text-gray-600 dark:text-gray-400">
             © 2024 Hostel Management System. All rights reserved.
           </p>
         </div>
