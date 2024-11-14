@@ -1,7 +1,7 @@
 interface User {
   id: string;
   email: string;
-  role: "admin" | "staff" | "student";
+  role: "admin" | "staff" | "student" | "parent";
   firstName: string;
   lastName: string;
 }
@@ -46,6 +46,7 @@ export const checkRouteAccess = (pathname: string): boolean => {
   const roleAccess = {
     student: ["/student/dashboard"],
     staff: ["/staff/dashboard"],
+    parent: ["/parent/dashboard"],
     admin: ["/admin/dashboard", "/student/dashboard", "/staff/dashboard"],
   };
 

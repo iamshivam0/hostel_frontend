@@ -21,6 +21,10 @@ const roleAccess = {
     allowed: ["/admin/dashboard", "/student/dashboard", "/staff/dashboard"], // Admin can access all routes
     redirect: "/admin/dashboard",
   },
+  parent: {
+    allowed: ["/parent/dashboard"],
+    redirect: "/parent/dashboard",
+  },
 };
 
 export function AuthGuard({ children }: AuthGuardProps) {
