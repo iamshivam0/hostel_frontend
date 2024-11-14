@@ -6,7 +6,7 @@ export interface IUser extends mongoose.Document {
   password: string;
   firstName: string;
   lastName: string;
-  role: "admin" | "student" | "staff";
+  role: "admin" | "student" | "staff" | "parent";
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "student", "staff"],
+      enum: ["admin", "student", "staff" , "parent"],
       default: "student",
     },
   },
