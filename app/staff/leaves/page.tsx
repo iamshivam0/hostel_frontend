@@ -75,7 +75,7 @@ const PendingLeaves = () => {
     try {
       const token = getToken();
       const response = await fetch(
-        `${API_BASE_URL}/api/leaves/${leaveId}/review`,
+        `${API_BASE_URL}/api/staff/leaves/${leaveId}/review`,
         {
           method: "POST",
           headers: {
