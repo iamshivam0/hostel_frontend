@@ -32,16 +32,13 @@ export default function ApplyLeave() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leaves/apply`, {
+      const response = await fetch(`${API_BASE_URL}/api/student/leaves`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          ...formData,
-          studentId: user._id,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {

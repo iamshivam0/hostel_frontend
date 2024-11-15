@@ -33,10 +33,10 @@ export default function ShowLeaves() {
     }
     fetchLeaves();
   }, [router]);
-
   const fetchLeaves = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leaves/my-leaves`, {
+      const response = await fetch(`${API_BASE_URL}/api/student/leaves`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

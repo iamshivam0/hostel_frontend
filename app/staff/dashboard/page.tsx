@@ -29,12 +29,12 @@ export default function StaffDashboard() {
       router.push("/login");
       return;
     }
-    // fetchLeaveStats();
+    fetchLeaveStats();
   }, [router]);
 
   const fetchLeaveStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leaves/all`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/leave-stats`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -45,6 +45,7 @@ export default function StaffDashboard() {
       }
 
       const stats = await response.json();
+      console.log(stats);
       setLeaveStats(stats);
     } catch (error) {
       console.error("Error fetching leave stats:", error);
@@ -105,7 +106,7 @@ export default function StaffDashboard() {
         </div>
 
         {/* Quick Stats */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
@@ -201,7 +202,7 @@ export default function StaffDashboard() {
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
 
         {/* Quick Actions */}
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">

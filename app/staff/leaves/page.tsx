@@ -39,7 +39,7 @@ const PendingLeaves = () => {
   const fetchLeaves = async () => {
     try {
       const token = getToken();
-      const response = await fetch(`${API_BASE_URL}/api/leaves/pending`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/leaves/pending`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

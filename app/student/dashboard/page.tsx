@@ -34,29 +34,17 @@ export default function StudentDashboard() {
 
   const fetchLeaveStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leaves/my-leaves`, {
+      const response = await fetch(`${API_BASE_URL}/api/student/leave-stats`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch leaves");
+        throw new Error("Failed to fetch leave stats");
       }
 
-      const leaves: Leave[] = await response.json();
-
-      // Calculate stats
-      const stats = leaves.reduce(
-        (acc, leave) => {
-          acc.total++;
-          if (leave.status.toLowerCase() === "pending") acc.pending++;
-          if (leave.status.toLowerCase() === "approved") acc.approved++;
-          return acc;
-        },
-        { pending: 0, approved: 0, total: 0 }
-      );
-
+      const stats = await response.json();
       setLeaveStats(stats);
     } catch (error) {
       console.error("Error fetching leave stats:", error);
