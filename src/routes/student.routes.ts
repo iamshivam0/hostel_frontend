@@ -11,6 +11,7 @@ import {
   updateStudentProfile,
   getStudentDashboard,
   changeStudentPassword,
+  getStudentRoomates,
 } from "../controllers/student.controller.js";
 
 const router = express.Router();
@@ -63,6 +64,14 @@ router.get(
   authenticateToken,
   authorizeRoles(["student"]),
   getStudentDashboard
+);
+
+// roomates route
+router.get(
+  "/roommates",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  getStudentRoomates
 );
 
 export default router;

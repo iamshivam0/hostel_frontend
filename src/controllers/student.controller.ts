@@ -255,3 +255,38 @@ export const changeStudentPassword = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to change password" });
   }
 };
+
+// Get student's roommates
+export const getStudentRoomates = async (req: Request, res: Response) => {
+  try {
+    const studentId = req.user?._id;
+    if (!studentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // First, get the current student's room number
+    const currentStudent = await User.findById(studentId);
+    if (!currentStudent || !currentStudent.roomNumber) {
+      return res
+        .status(404)
+        .json({ message: "Student or room number not found" });
+    }
+
+    // Find all students with the same room number, excluding the current student
+    const roommates = await User.find({
+      _id: { $ne: studentId }, // Exclude current student
+      role: "student",
+      roomNumber: currentStudent.roomNumber,
+    })
+      .select("firstName lastName email roomNumber") // Select only necessary fields
+      .lean();
+
+    res.json({
+      roomNumber: currentStudent.roomNumber,
+      roommates: roommates,
+    });
+  } catch (error) {
+    console.error("Error fetching roommates:", error);
+    res.status(500).json({ message: "Failed to fetch roommates" });
+  }
+};
