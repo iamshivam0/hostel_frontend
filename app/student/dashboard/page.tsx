@@ -93,12 +93,19 @@ export default function StudentDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-2">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
+            <h2
+              className="text-3xl font-bold mb-2"
+              aria-label={`Welcome back, ${user.firstName}`}
+            >
               Welcome back, {user.firstName} 👋
             </h2>
             <p className="text-blue-100">
-              Access all your hostel services from your personal dashboard
+              Room Number: <strong>{user.roomNumber}</strong>
+            </p>
+
+            <p className="text-blue-100">
+              Access all your hostel services from your personal dashboard.
             </p>
           </div>
         </div>
