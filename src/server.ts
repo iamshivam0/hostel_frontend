@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import leaveRoutes from "./routes/leave.routes.js";
+import parentRoutes from "./routes/parent.routes.js"
 
 dotenv.config();
 
@@ -20,7 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+
 app.use("/api/leaves", leaveRoutes);
+app.use("/api/parent", parentRoutes);
 
 // Database connection
 mongoose
