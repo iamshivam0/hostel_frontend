@@ -7,6 +7,7 @@ export interface IUser extends mongoose.Document {
   firstName: string;
   lastName: string;
   role: "admin" | "student" | "staff" | "parent";
+  roomNumber?: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -33,8 +34,15 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "student", "staff" , "parent"],
+      enum: ["admin", "student", "staff", "parent"],
       default: "student",
+    },
+    roomNumber: {
+      type: String,
+      required: function (): boolean {
+        return (this as IUser).role === "student";
+      },
+      sparse: true,
     },
   },
   {

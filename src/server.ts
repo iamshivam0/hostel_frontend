@@ -3,9 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.routes.js";
-import userRoutes from "./routes/user.routes.js";
+// import userRoutes from "./routes/user.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import leaveRoutes from "./routes/leave.routes.js";
+// import leaveRoutes from "./routes/leave.routes.js";
 import parentRoutes from "./routes/parent.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
@@ -21,10 +21,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
+// app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-app.use("/api/leaves", leaveRoutes);
+// app.use("/api/leaves", leaveRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/staff", staffRoutes);

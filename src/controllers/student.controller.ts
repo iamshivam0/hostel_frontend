@@ -10,7 +10,8 @@ export const getStudentProfile = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const student = await User.findById(studentId).select("-password");
+    const student = await User.findById(studentId).select("-password").lean();
+
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
@@ -151,11 +152,11 @@ export const updateStudentProfile = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, roomNumber } = req.body;
 
     const student = await User.findByIdAndUpdate(
       studentId,
-      { firstName, lastName, email },
+      { firstName, lastName, email, roomNumber },
       { new: true }
     ).select("-password");
 
