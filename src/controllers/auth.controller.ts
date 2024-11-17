@@ -34,6 +34,7 @@ export const login = async (req: Request, res: Response) => {
       lastName: user.lastName,
       role: user.role,
       ...(user.role === "student" && { roomNumber: user.roomNumber }), // Include roomNumber only for students
+      ...(user.role === "student" && { parentId: user.parentId }), // Include parentId only for students
     };
 
     res.json({
@@ -48,7 +49,8 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, role, roomNumber } = req.body;
+    const { email, password, firstName, lastName, role, roomNumber, children } =
+      req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -56,23 +58,46 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Validate room number for students
-    if (role === "student" && !roomNumber) {
-      return res
-        .status(400)
-        .json({ message: "Room number is required for students" });
+    // Validate role
+    if (!["admin", "student", "staff", "parent"].includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role specified",
+      });
     }
 
-    // Create new user
-    const user = new User({
+    // Create base user data
+    const userData: any = {
       email,
       password,
       firstName,
       lastName,
       role,
-      ...(role === "student" && { roomNumber }), // Add roomNumber only for students
-    });
+    };
 
+    // Add role-specific fields ONLY
+    switch (role) {
+      case "student":
+        if (!roomNumber) {
+          return res.status(400).json({
+            message: "Room number is required for students",
+          });
+        }
+        userData.roomNumber = roomNumber;
+        break;
+      case "parent":
+        userData.children = []; // Always initialize as empty array
+        // Explicitly set parentId to undefined for parents
+        userData.parentId = undefined;
+        userData.roomNumber = undefined;
+        break;
+      default:
+        // For admin and staff, ensure student/parent specific fields are undefined
+        userData.children = undefined;
+        userData.parentId = undefined;
+        userData.roomNumber = undefined;
+    }
+
+    const user = new User(userData);
     await user.save();
 
     // Generate JWT
@@ -82,22 +107,31 @@ export const register = async (req: Request, res: Response) => {
       { expiresIn: "24h" }
     );
 
-    // Include roomNumber in response if user is a student
-    const userData = {
+    // Prepare response data
+    const responseData = {
       id: user._id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      ...(role === "student" && { roomNumber: user.roomNumber }), // Include roomNumber only for students
     };
+
+    // Add role-specific fields to response
+    if (role === "student") {
+      Object.assign(responseData, { roomNumber: user.roomNumber });
+    } else if (role === "parent") {
+      Object.assign(responseData, { children: user.children });
+    }
 
     res.status(201).json({
       token,
-      user: userData,
+      user: responseData,
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ message: "Registration failed" });
+    res.status(500).json({
+      message: "Registration failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };

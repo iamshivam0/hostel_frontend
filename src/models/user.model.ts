@@ -8,6 +8,8 @@ export interface IUser extends mongoose.Document {
   lastName: string;
   role: "admin" | "student" | "staff" | "parent";
   roomNumber?: string;
+  parentId?: mongoose.Types.ObjectId;
+  children?: mongoose.Types.ObjectId[];
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -44,6 +46,33 @@ const userSchema = new mongoose.Schema(
       },
       sparse: true,
     },
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: undefined,
+      validate: {
+        validator: function (value: mongoose.Types.ObjectId | undefined) {
+          const user = this as IUser;
+          if (value && user.role !== "student") {
+            return false;
+          }
+          return true;
+        },
+        message: "Only students can have a parent assigned",
+      },
+    },
+    children: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        validate: {
+          validator: function (this: IUser) {
+            return this.role === "parent";
+          },
+          message: "Only parents can have children assigned",
+        },
+      },
+    ],
   },
   {
     timestamps: true,
