@@ -1,8 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hostel Management System - Frontend
+
+This project is the frontend for a comprehensive Hostel Management System, built with Next.js and TypeScript.
+
+## Features
+
+- User authentication (Student, Warden, Admin)
+- Room allocation and management
+- Complaint submission and tracking
+- Mess menu management
+- Notice board for announcements
+- Student profile management
 
 ## Getting Started
 
-First, run the development server:
+To run the development server:
 
 ```bash
 npm run dev
@@ -14,25 +25,40 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 15.0.3
+- React 19.0.0
+- TypeScript
+- Tailwind CSS
+- Shadcn UI components
+
+## Project Structure
+
+- `app/`: Contains the main application pages and layouts
+- `components/`: Reusable React components
+- `lib/`: Utility functions and custom hooks
+- `public/`: Static assets
+
+## Development
+
+Edit `app/page.tsx` to modify the main page. The application uses hot reloading, so changes will be reflected immediately.
+
+## Styling
+
+This project uses Tailwind CSS for styling. The configuration can be found in `tailwind.config.ts`.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+For more information on the technologies used:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-# hostel_frontend
+This application is designed to be easily deployed on Vercel. Refer to the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for detailed instructions.
