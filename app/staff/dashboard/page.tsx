@@ -289,6 +289,32 @@ export default function StaffDashboard() {
               View and edit your profile
             </p>
           </button>
+          <button
+            onClick={() => router.push("/staff/complaints")}
+            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+          >
+            <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
+              <svg
+                className="w-8 h-8 text-red-600 dark:text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Complaints
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              View and handle student complaints
+            </p>
+          </button>
         </div>
       </main>
     </div>
