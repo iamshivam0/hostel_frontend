@@ -15,9 +15,11 @@ import {
 } from "../controllers/student.controller.js";
 import {
   createComplaint,
+  getStudentComplaints,
   updateComplaint,
+  deleteStudentComplaint,
 } from "../controllers/Complaints.controller.js";
-import { isStudent} from "../middleware/complaint.middleware.js";
+// import { isStudent } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 
@@ -78,8 +80,31 @@ router.get(
   authorizeRoles(["student"]),
   getStudentRoomates
 );
-router.post("/complaint",authenticateToken, authorizeRoles(["student"]), createComplaint);
 
-router.put("/complaint-update/:id",authenticateToken, authorizeRoles(["student"]) , updateComplaint);
+// Complaint routes
+router.post(
+  "/complaint",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  createComplaint
+);
+router.put(
+  "/complaint-update/:id",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  updateComplaint
+);
+router.get(
+  "/complaint",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  getStudentComplaints
+);
+router.delete(
+  "/complaint/:id",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  deleteStudentComplaint
+);
 
 export default router;
