@@ -44,6 +44,6 @@ router.delete("/parent/:id", deleteParent);
 router.post("/assign-parent", assignParentToStudent);
 router.delete("/remove-parent/:studentId", removeParentFromStudent);
 
-router.delete("/delete:id",  deleteComplaint);
+router.delete("/delete/:id",  deleteComplaint);
 
 export default router;

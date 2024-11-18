@@ -80,6 +80,6 @@ router.get(
 );
 router.post("/complaint",authenticateToken, authorizeRoles(["student"]), createComplaint);
 
-router.put("/complaint-update:id",authenticateToken, authorizeRoles(["student"]) , updateComplaint);
+router.put("/complaint-update/:id",authenticateToken, authorizeRoles(["student"]) , updateComplaint);
 
 export default router;
