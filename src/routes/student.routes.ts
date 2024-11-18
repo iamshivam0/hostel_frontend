@@ -13,6 +13,11 @@ import {
   changeStudentPassword,
   getStudentRoomates,
 } from "../controllers/student.controller.js";
+import {
+  createComplaint,
+  updateComplaint,
+} from "../controllers/Complaints.controller.js";
+import { isStudent} from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 
@@ -73,5 +78,8 @@ router.get(
   authorizeRoles(["student"]),
   getStudentRoomates
 );
+router.post("/complaint",authenticateToken, authorizeRoles(["student"]), createComplaint);
+
+router.put("/complaint-update/:id",authenticateToken, authorizeRoles(["student"]) , updateComplaint);
 
 export default router;
