@@ -12,8 +12,8 @@ import {
   getStaffDashboard,
   changestaffPassword,
 } from "../controllers/staff.controller.js";
-import {getComplaints} from "../controllers/Complaints.controller.js";
-import {  isStaff } from "../middleware/complaint.middleware.js"
+import { getComplaints } from "../controllers/Complaints.controller.js";
+import { isStaff } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 
@@ -67,8 +67,11 @@ router.get(
   authorizeRoles(["staff"]),
   getStaffDashboard
 );
-router.get("/complaints",
+router.get(
+  "/complaints",
   authenticateToken,
-  authorizeRoles(["staff"]), getComplaints);
+  authorizeRoles(["staff"]),
+  getComplaints
+);
 
 export default router;
