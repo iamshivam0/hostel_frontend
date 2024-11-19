@@ -12,6 +12,7 @@ import {
   getStudentDashboard,
   changeStudentPassword,
   getStudentRoomates,
+  uploadProfilePicture,
 } from "../controllers/student.controller.js";
 import {
   createComplaint,
@@ -19,6 +20,8 @@ import {
   updateComplaint,
   deleteStudentComplaint,
 } from "../controllers/Complaints.controller.js";
+import multer from "multer";
+const upload = multer({ dest: "uploads/" });
 // import { isStudent } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
@@ -106,5 +109,7 @@ router.delete(
   authorizeRoles(["student"]),
   deleteStudentComplaint
 );
+router.post("/upload-profile-pic", authenticateToken,
+  authorizeRoles(["student"]), upload.single("profilePic"), uploadProfilePicture);
 
 export default router;
