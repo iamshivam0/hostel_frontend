@@ -286,7 +286,7 @@ export const getParentsComplaints = async (req: Request, res: Response) => {
   try {
     const parentId = req.user?._id;
 
-    // Find parent and their child
+    // Find parent and their children
     const parent = await User.findOne({
       _id: parentId,
       role: "parent",
@@ -296,19 +296,21 @@ export const getParentsComplaints = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Parent not found" });
     }
 
-    // Find child using parent's children array
-    const child = await User.findOne({
+    // Find all children using parent's children array
+    const children = await User.find({
       _id: { $in: parent.children },
       role: "student",
     });
 
-    if (!child) {
-      return res.status(404).json({ message: "Child not found" });
+    if (!children.length) {
+      return res.status(404).json({ message: "No children found" });
     }
 
-    // Populate the student field with firstName and roomNumber
-    const complaints = await Complaint.find({ student: child._id })
-      .populate("student", "firstName roomNumber")
+    // Get complaints for all children
+    const complaints = await Complaint.find({
+      student: { $in: children.map((child) => child._id) },
+    })
+      .populate("student", "firstName lastName roomNumber")
       .lean()
       .exec();
 
@@ -318,7 +320,9 @@ export const getParentsComplaints = async (req: Request, res: Response) => {
       status: complaint.status,
       studentDetails: {
         firstName: complaint.student
-          ? (complaint.student as any).firstName
+          ? `${(complaint.student as any).firstName} ${
+              (complaint.student as any).lastName
+            }`
           : "N/A",
         roomNumber: complaint.student
           ? (complaint.student as any).roomNumber

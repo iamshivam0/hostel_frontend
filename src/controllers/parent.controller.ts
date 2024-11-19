@@ -14,7 +14,7 @@ export const getChildStats = async (req: AuthRequest, res: Response) => {
   try {
     const parentId = req.user?._id;
 
-    // Find parent and their child
+    // Find parent and their children
     const parent = await User.findOne({
       _id: parentId,
       role: "parent",
@@ -24,30 +24,34 @@ export const getChildStats = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Parent not found" });
     }
 
-    // Find child using parent's children array
-    const child = await User.findOne({
+    // Find all children using parent's children array
+    const children = await User.find({
       _id: { $in: parent.children },
       role: "student",
     });
 
-    if (!child) {
-      return res.status(404).json({ message: "Child not found" });
+    if (!children.length) {
+      return res.status(404).json({ message: "No children found" });
     }
 
-    // Get leave statistics
-    const leaves = await Leave.find({ studentId: child._id });
+    // Get leave statistics for all children
+    const childrenStats = await Promise.all(
+      children.map(async (child) => {
+        const leaves = await Leave.find({ studentId: child._id });
 
-    const stats = {
-      totalLeaves: leaves.length,
-      pendingLeaves: leaves.filter((leave) => leave.status === "pending")
-        .length,
-      approvedLeaves: leaves.filter((leave) => leave.status === "approved")
-        .length,
-      childName: `${child.firstName} ${child.lastName}`,
-      roomNumber: child.roomNumber,
-    };
+        return {
+          childName: `${child.firstName} ${child.lastName}`,
+          roomNumber: child.roomNumber,
+          totalLeaves: leaves.length,
+          pendingLeaves: leaves.filter((leave) => leave.status === "pending")
+            .length,
+          approvedLeaves: leaves.filter((leave) => leave.status === "approved")
+            .length,
+        };
+      })
+    );
 
-    res.status(200).json(stats);
+    res.status(200).json({ children: childrenStats });
   } catch (error) {
     console.error("Error in getChildStats:", error);
     res.status(500).json({ message: "Internal server error" });
