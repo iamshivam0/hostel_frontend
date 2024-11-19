@@ -13,7 +13,6 @@ import {
   changestaffPassword,
 } from "../controllers/staff.controller.js";
 import { getComplaints } from "../controllers/Complaints.controller.js";
-import { isStaff } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 

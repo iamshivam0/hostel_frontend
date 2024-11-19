@@ -19,7 +19,6 @@ import {
   deleteComplaint,
   getComplaints,
 } from "../controllers/Complaints.controller.js";
-import { isAdmin } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 
@@ -33,7 +32,7 @@ router.post("/create", createAdmin);
 router.get("/students", getAllStudents);
 router.get("/parents", getAllParents);
 router.get("/student-parent/:studentId", getStudentParentInfo);
-router.get("/complaints",getComplaints);
+router.get("/complaints", getComplaints);
 
 // Parent Management
 router.post("/parent", createParent);
@@ -44,6 +43,6 @@ router.delete("/parent/:id", deleteParent);
 router.post("/assign-parent", assignParentToStudent);
 router.delete("/remove-parent/:studentId", removeParentFromStudent);
 
-router.delete("/delete/:id",  deleteComplaint);
+router.delete("/delete/:id", deleteComplaint);
 
 export default router;
