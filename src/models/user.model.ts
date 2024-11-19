@@ -10,6 +10,7 @@ export interface IUser extends mongoose.Document {
   roomNumber?: string;
   parentId?: mongoose.Types.ObjectId;
   children?: mongoose.Types.ObjectId[];
+  profilePicUrl?: string; // Optional field for profile picture
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -73,6 +74,11 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    profilePicUrl: {
+      type: String,
+      default: null, // Default to null if no profile picture is uploaded
+      trim: true,
+    },
   },
   {
     timestamps: true,

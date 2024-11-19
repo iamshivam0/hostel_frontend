@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import Leave from "../models/leave.model.js";
 import User from "../models/user.model.js";
-
+import cloudinary from "../config/Cloudinary.js";
+import { updateProfilePic } from "../services/User.service.js";
 // Get student profile
 export const getStudentProfile = async (req: Request, res: Response) => {
   try {
@@ -288,5 +289,35 @@ export const getStudentRoomates = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching roommates:", error);
     res.status(500).json({ message: "Failed to fetch roommates" });
+  }
+};
+
+export const uploadProfilePicture = async (req: Request, res: Response) => {
+  const userId = req.user?._id; // Assuming authentication middleware adds `req.user`
+
+  if (!userId || !req.file) {
+    return res.status(400).json({ error: "User ID and file are required" });
+  }
+  // console.log(userId)
+  try {
+    // Upload file to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "profile_pics",
+    });
+
+    // Update user's profile picture in the database
+    const updatedUser = await updateProfilePic(userId, result.secure_url);
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile picture updated successfully",
+      profilePicUrl: result.secure_url,
+    });
+  } catch (error) {
+    console.error("Error uploading profile picture:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
