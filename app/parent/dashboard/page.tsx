@@ -8,11 +8,13 @@ import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
 
 interface ChildStats {
-  totalLeaves: number;
-  pendingLeaves: number;
-  approvedLeaves: number;
-  childName: string;
-  roomNumber: string;
+  children: Array<{
+    childName: string;
+    roomNumber: string;
+    totalLeaves: number;
+    pendingLeaves: number;
+    approvedLeaves: number;
+  }>;
 }
 
 export default function ParentDashboard() {
@@ -93,14 +95,16 @@ export default function ParentDashboard() {
             <h2 className="text-3xl font-bold mb-2">
               Welcome, {user.firstName} 👋
             </h2>
-            {childStats && (
-              <p className="text-blue-100">
-                Your child: <strong>{childStats.childName}</strong> | Room
-                Number: <strong>{childStats.roomNumber}</strong>
-              </p>
-            )}
-            <p className="text-blue-100">
-              Monitor your child's hostel activities and manage permissions.
+            {childStats &&
+              childStats.children.map((child, index) => (
+                <p key={index} className="text-blue-100 mb-2">
+                  Child {childStats.children.length > 1 ? index + 1 : ""}:{" "}
+                  <strong>{child.childName}</strong> | Room Number:{" "}
+                  <strong>{child.roomNumber}</strong>
+                </p>
+              ))}
+            <p className="text-blue-100 mt-2">
+              Monitor your children's hostel activities and manage permissions.
             </p>
           </div>
         </div>
