@@ -131,12 +131,10 @@ export const updateComplaint = async (req: Request, res: Response) => {
     });
 
     if (!complaint) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Complaint not found or unauthorized",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Complaint not found or unauthorized",
+      });
     }
 
     // Update fields if provided
@@ -279,6 +277,66 @@ export const deleteStudentComplaint = async (req: Request, res: Response) => {
       return res.status(500).json({ success: false, error: error.message });
     } else {
       return res.status(500).json({ success: false, error: "Unknown error" });
+    }
+  }
+};
+
+// Get all complaints (Staff/Admin)
+export const getParentsComplaints = async (req: Request, res: Response) => {
+  try {
+    const parentId = req.user?._id;
+
+    // Find parent and their child
+    const parent = await User.findOne({
+      _id: parentId,
+      role: "parent",
+    });
+
+    if (!parent) {
+      return res.status(404).json({ message: "Parent not found" });
+    }
+
+    // Find child using parent's children array
+    const child = await User.findOne({
+      _id: { $in: parent.children },
+      role: "student",
+    });
+
+    if (!child) {
+      return res.status(404).json({ message: "Child not found" });
+    }
+
+    // Populate the student field with firstName and roomNumber
+    const complaints = await Complaint.find({ student: child._id })
+      .populate("student", "firstName roomNumber")
+      .lean()
+      .exec();
+
+    const transformedComplaints = complaints.map((complaint) => ({
+      _id: complaint._id,
+      description: complaint.description,
+      status: complaint.status,
+      studentDetails: {
+        firstName: complaint.student
+          ? (complaint.student as any).firstName
+          : "N/A",
+        roomNumber: complaint.student
+          ? (complaint.student as any).roomNumber
+          : "N/A",
+      },
+      createdAt: complaint.createdAt,
+      updatedAt: complaint.updatedAt,
+    }));
+
+    res.status(200).json({
+      success: true,
+      complaints: transformedComplaints,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ success: false, error: error.message });
+    } else {
+      res.status(500).json({ success: false, error: "Unknown error" });
     }
   }
 };

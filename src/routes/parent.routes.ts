@@ -3,30 +3,66 @@ import {
   authenticateToken,
   authorizeRoles,
 } from "../middleware/auth.middleware.js";
-// import { authenticateToken } from ;
+import {
+  getChildStats,
+  getChildInfo,
+  getChildLeaves,
+  getParentProfile,
+  getDashboardInfo,
+  updateParentProfile,
+} from "../controllers/parent.controller.js";
+import { getParentsComplaints } from "../controllers/Complaints.controller.js";
 
 const router = express.Router();
 
-// Route to show a "HI" message when a parent logs in
+// Child related routes
+router.get(
+  "/child-stats",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getChildStats
+);
+router.get(
+  "/child-info",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getChildInfo
+);
+
+router.get(
+  "/child-leaves",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getChildLeaves
+);
+
+// Parent profile routes
 router.get(
   "/parent_profile",
   authenticateToken,
   authorizeRoles(["parent"]),
-  (req, res) => {
-    res.status(200).json({ message: "HI" });
-  }
+  getParentProfile
+);
+router.patch(
+  "/update-profile",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  updateParentProfile
 );
 
-// Parent routes
+router.get(
+  "/getcomplaints",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getParentsComplaints
+);
+
+// Dashboard route
 router.get(
   "/dashboard",
   authenticateToken,
   authorizeRoles(["parent"]),
-  (req, res) => {
-    res.json({ message: "Parent dashboard" });
-  }
+  getDashboardInfo
 );
-
-// Add more parent-specific routes here
 
 export default router;
