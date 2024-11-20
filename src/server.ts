@@ -10,7 +10,7 @@ import parentRoutes from "./routes/parent.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
 // import complaintRoutes from "./routes/Complaint.routes.js";
-
+import './config/Cloudinary.js';
 dotenv.config();
 
 const app = express();
@@ -35,7 +35,7 @@ app.use("/api/staff", staffRoutes);
 mongoose
   .connect(
     process.env.MONGODB_URI ||
-      "mongodb+srv://shivamchandak009:eL540KvrMd37rpt3@cluster0.hvpqc.mongodb.net/"
+      ""
   )
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
