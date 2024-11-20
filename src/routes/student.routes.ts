@@ -90,7 +90,7 @@ router.post(
   authorizeRoles(["student"]),
   createComplaint
 );
-router.put(
+router.patch(
   "/complaint-update/:id",
   authenticateToken,
   authorizeRoles(["student"]),
@@ -108,6 +108,9 @@ router.delete(
   authorizeRoles(["student"]),
   deleteStudentComplaint
 );
+
+
+//profile routes
 router.post(
   "/upload-profile-pic",
   authenticateToken,
