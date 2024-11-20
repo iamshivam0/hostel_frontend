@@ -345,3 +345,63 @@ export const deleteParent = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getstaff = async (req: Request, res: Response) => {
+  try {
+    const staff = await User.find({ role: { $regex: /^staff$/i } })
+      .select("firstName lastName email ")
+      .lean();
+
+    res.status(200).json(staff);
+    console.log(await User.find({ role: "staff" }));
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching staff",
+      error: error.message,
+    });
+  }
+};
+
+export const createStaff = async (req: Request, res: Response) => {
+  try {
+    const { email, password, firstName, lastName } = req.body;
+
+    // Check if staff already exists
+    const existingStaff = await User.findOne({ email });
+    if (existingStaff) {
+      return res.status(400).json({
+        success: false,
+        message: "staff with this email already exists",
+      });
+    }
+
+    // Create new staff
+    const staff = new User({
+      email,
+      password,
+      firstName,
+      lastName,
+      role: "staff",
+    });
+
+    await staff.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "staff created successfully",
+      data: {
+        id: staff._id,
+        email: staff.email,
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Error creating staff",
+      error: error.message,
+    });
+  }
+};

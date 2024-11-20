@@ -14,6 +14,8 @@ import {
   updateParent,
   deleteParent,
   createAdmin,
+  getstaff,
+  createStaff,
 } from "../controllers/admin.controller.js";
 import {
   deleteComplaint,
@@ -44,5 +46,10 @@ router.post("/assign-parent", assignParentToStudent);
 router.delete("/remove-parent/:studentId", removeParentFromStudent);
 
 router.delete("/delete/:id", deleteComplaint);
+
+
+// staff management 
+router.get("/getallstaffs",getstaff);
+router.post("/staff-create",createStaff);
 
 export default router;
