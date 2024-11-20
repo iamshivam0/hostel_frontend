@@ -13,6 +13,7 @@ import {
   reviewLeave,
 } from "../controllers/parent.controller.js";
 import { getParentsComplaints } from "../controllers/Complaints.controller.js";
+import { validateLeaveReview } from "../middleware/leave.middleware.js";
 
 const router = express.Router();
 
@@ -54,11 +55,12 @@ router.get(
   getChildLeaves
 );
 
-// Add this new route for reviewing leaves
+// Update the review endpoint to match staff pattern
 router.post(
   "/leaves/:leaveId/review",
   authenticateToken,
   authorizeRoles(["parent"]),
+  validateLeaveReview,
   reviewLeave
 );
 

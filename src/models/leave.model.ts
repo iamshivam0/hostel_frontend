@@ -6,12 +6,18 @@ const reviewSchema = new mongoose.Schema({
     enum: ["pending", "approved", "rejected"],
     default: "pending",
   },
-  remarks: String,
+  remarks: {
+    type: String,
+    default: "",
+  },
   reviewedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  reviewedAt: Date,
+  reviewedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 const leaveSchema = new mongoose.Schema(
