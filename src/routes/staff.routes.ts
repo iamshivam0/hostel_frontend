@@ -16,59 +16,69 @@ import { getComplaints } from "../controllers/Complaints.controller.js";
 
 const router = express.Router();
 
+// Add interface for authenticated request
+interface AuthenticatedRequest extends express.Request {
+  user?: {
+    _id: string;
+    role: string;
+  };
+}
+
 // Staff profile routes
 router.get(
   "/profile",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   getStaffProfile
 );
 
-//password
-
-router.put(
-  "/change-password",
-  authenticateToken,
-  authorizeRoles(["staff"]),
-  changestaffPassword
-);
-
 // Leave management routes
 router.get(
-  "/leaves",
-  authenticateToken,
-  authorizeRoles(["staff"]),
-  getAllLeaves
-);
-router.get(
   "/leaves/pending",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   getPendingLeaves
 );
+
 router.post(
   "/leaves/:leaveId/review",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   reviewLeave
 );
+
+// Other routes remain the same...
+router.get(
+  "/leaves",
+  authenticateToken as any,
+  authorizeRoles(["staff"]),
+  getAllLeaves
+);
+
 router.get(
   "/leave-stats",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   getStaffLeaveStats
 );
 
-// Dashboard route
 router.get(
   "/dashboard",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   getStaffDashboard
 );
+
+router.put(
+  "/change-password",
+  authenticateToken as any,
+  authorizeRoles(["staff"]),
+  changestaffPassword
+);
+
 router.get(
   "/complaints",
-  authenticateToken,
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   getComplaints
 );

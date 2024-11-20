@@ -64,18 +64,30 @@ export const getStudentLeaveStats = async (req: Request, res: Response) => {
 export const getStudentLeaves = async (req: Request, res: Response) => {
   try {
     const studentId = req.user?._id;
+
     if (!studentId) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
 
     const leaves = await Leave.find({ studentId })
       .sort({ createdAt: -1 })
-      .populate("reviewedBy", "firstName lastName");
+      .populate("parentReview.reviewedBy", "firstName lastName")
+      .populate("staffReview.reviewedBy", "firstName lastName");
 
-    res.json(leaves);
+    res.status(200).json({
+      success: true,
+      leaves,
+    });
   } catch (error) {
-    console.error("Error fetching leaves:", error);
-    res.status(500).json({ message: "Failed to fetch leaves" });
+    console.error("Error fetching student leaves:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch leaves",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 

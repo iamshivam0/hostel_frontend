@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const reviewSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+  remarks: String,
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  reviewedAt: Date,
+});
+
 const leaveSchema = new mongoose.Schema(
   {
     studentId: {
@@ -15,49 +29,37 @@ const leaveSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    leaveType: {
-      type: String,
-      enum: ["personal", "medical", "emergency", "other"],
-      required: true,
-    },
     reason: {
       type: String,
       required: true,
     },
+    leaveType: {
+      type: String,
+      default: "regular",
+    },
     contactNumber: {
       type: String,
-      required: true,
+      default: "",
     },
     parentContact: {
       type: String,
-      required: true,
+      default: "",
     },
     address: {
       type: String,
-      required: true,
+      default: "",
     },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    staffRemarks: {
-      type: String,
-      default: "",
-    },
-    reviewedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
-    reviewedAt: {
-      type: Date,
-      default: null,
-    },
+    parentReview: reviewSchema,
+    staffReview: reviewSchema,
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model("Leave", leaveSchema);
+const Leave = mongoose.model("Leave", leaveSchema);
+
+export default Leave;

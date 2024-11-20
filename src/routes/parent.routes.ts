@@ -10,18 +10,35 @@ import {
   getParentProfile,
   getDashboardInfo,
   updateParentProfile,
+  reviewLeave,
 } from "../controllers/parent.controller.js";
 import { getParentsComplaints } from "../controllers/Complaints.controller.js";
 
 const router = express.Router();
 
-// Child related routes
+// Profile routes
+router.get(
+  "/profile",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getParentProfile
+);
+
+router.put(
+  "/profile",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  updateParentProfile
+);
+
+// Child information routes
 router.get(
   "/child-stats",
   authenticateToken,
   authorizeRoles(["parent"]),
   getChildStats
 );
+
 router.get(
   "/child-info",
   authenticateToken,
@@ -29,6 +46,7 @@ router.get(
   getChildInfo
 );
 
+// Leave management routes
 router.get(
   "/child-leaves",
   authenticateToken,
@@ -36,25 +54,12 @@ router.get(
   getChildLeaves
 );
 
-// Parent profile routes
-router.get(
-  "/parent_profile",
+// Add this new route for reviewing leaves
+router.post(
+  "/leaves/:leaveId/review",
   authenticateToken,
   authorizeRoles(["parent"]),
-  getParentProfile
-);
-router.patch(
-  "/update-profile",
-  authenticateToken,
-  authorizeRoles(["parent"]),
-  updateParentProfile
-);
-
-router.get(
-  "/getcomplaints",
-  authenticateToken,
-  authorizeRoles(["parent"]),
-  getParentsComplaints
+  reviewLeave
 );
 
 // Dashboard route
@@ -63,6 +68,14 @@ router.get(
   authenticateToken,
   authorizeRoles(["parent"]),
   getDashboardInfo
+);
+
+// Complaints route
+router.get(
+  "/complaints",
+  authenticateToken,
+  authorizeRoles(["parent"]),
+  getParentsComplaints
 );
 
 export default router;

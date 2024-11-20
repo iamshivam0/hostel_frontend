@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../models/user.model.js";
 import Leave from "../models/leave.model.js";
+import mongoose from "mongoose";
 
 // Add type for the authenticated request
 interface AuthRequest extends Request {
@@ -100,18 +101,24 @@ export const getChildLeaves = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Parent not found" });
     }
 
-    const child = await User.findOne({
+    // Find all children
+    const children = await User.find({
       _id: { $in: parent.children },
       role: "student",
     });
 
-    if (!child) {
-      return res.status(404).json({ message: "Child not found" });
+    if (!children.length) {
+      return res.status(404).json({ message: "No children found" });
     }
 
-    const leaves = await Leave.find({ studentId: child._id }).sort({
-      createdAt: -1,
-    });
+    // Get leaves for all children
+    const leaves = await Leave.find({
+      studentId: { $in: children.map((child) => child._id) },
+    })
+      .sort({ createdAt: -1 })
+      .populate("studentId", "firstName lastName email")
+      .populate("parentReview.reviewedBy", "firstName lastName")
+      .populate("staffReview.reviewedBy", "firstName lastName");
 
     res.status(200).json(leaves);
   } catch (error) {
@@ -210,5 +217,66 @@ export const updateParentProfile = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Error in updateParentProfile:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const reviewLeave = async (req: AuthRequest, res: Response) => {
+  try {
+    const { leaveId } = req.params;
+    const { action, remarks } = req.body;
+    const parentId = req.user?._id;
+
+    if (!parentId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!["approve", "reject"].includes(action)) {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    // Find the leave and verify it belongs to parent's child
+    const parent = await User.findOne({ _id: parentId, role: "parent" });
+    if (!parent) {
+      return res.status(404).json({ message: "Parent not found" });
+    }
+
+    const leave = await Leave.findOne({
+      _id: leaveId,
+      studentId: { $in: parent.children },
+    });
+
+    if (!leave) {
+      return res
+        .status(404)
+        .json({ message: "Leave not found or unauthorized" });
+    }
+
+    if (leave.status !== "pending") {
+      return res.status(400).json({ message: "Leave already reviewed" });
+    }
+
+    // Update parent review status with converted ObjectId
+    leave.parentReview = {
+      status: action === "approve" ? "approved" : "rejected",
+      remarks: remarks,
+      reviewedBy: new mongoose.Types.ObjectId(parentId),
+      reviewedAt: new Date(),
+    };
+
+    // Only update the final status if both parent and staff have approved
+    if (leave.staffReview?.status === "approved" && action === "approve") {
+      leave.status = "approved";
+    } else if (action === "reject") {
+      leave.status = "rejected";
+    } else {
+      leave.status = "pending"; // Keep pending if waiting for other approval
+    }
+
+    await leave.save();
+
+    res.json({ message: `Leave ${action}ed by parent`, leave });
+  } catch (error) {
+    console.error("Error reviewing leave:", error);
+    res.status(500).json({ message: "Failed to review leave" });
   }
 };

@@ -22,7 +22,6 @@ import {
 } from "../controllers/Complaints.controller.js";
 import multer from "multer";
 const upload = multer({ dest: "uploads/" });
-// import { isStudent } from "../middleware/complaint.middleware.js";
 
 const router = express.Router();
 
@@ -56,7 +55,7 @@ router.get(
   getStudentLeaves
 );
 router.post(
-  "/leaves",
+  "/leaves/apply",
   authenticateToken,
   authorizeRoles(["student"]),
   submitLeave
@@ -109,7 +108,12 @@ router.delete(
   authorizeRoles(["student"]),
   deleteStudentComplaint
 );
-router.post("/upload-profile-pic", authenticateToken,
-  authorizeRoles(["student"]), upload.single("profilePic"), uploadProfilePicture);
+router.post(
+  "/upload-profile-pic",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  upload.single("profilePic"),
+  uploadProfilePicture
+);
 
 export default router;
