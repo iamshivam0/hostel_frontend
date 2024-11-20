@@ -4,6 +4,17 @@ import React, { useEffect, useState } from "react";
 import { getToken } from "@/app/utils/auth";
 import { useRouter } from "next/navigation";
 
+interface Review {
+  status: "pending" | "approved" | "rejected";
+  remarks?: string;
+  reviewedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  reviewedAt?: Date;
+}
+
 interface Leave {
   _id: string;
   startDate: string;
@@ -14,19 +25,14 @@ interface Leave {
   parentContact: string;
   address: string;
   status: string;
-  staffRemarks: string;
+  parentReview?: Review;
+  staffReview?: Review;
   createdAt: string;
-  reviewedAt?: string;
   studentId: {
     _id: string;
     firstName: string;
     lastName: string;
     email: string;
-  };
-  reviewedBy?: {
-    _id: string;
-    firstName: string;
-    lastName: string;
   };
 }
 
@@ -86,18 +92,22 @@ const PendingLeaves = () => {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Failed to ${action} leave`);
+        throw new Error(data.message || `Failed to ${action} leave`);
       }
 
       // Show success message
-      alert(`Leave ${action}ed successfully`);
+      alert(data.message || `Leave ${action}ed successfully`);
 
       // Refresh the leaves list
       fetchLeaves();
     } catch (error) {
-      console.error(`Error ${action}ing leave:`, error);
-      alert(`Failed to ${action} leave. Please try again.`);
+      const errorMessage =
+        error instanceof Error ? error.message : `Failed to ${action} leave`;
+      console.error(`Error ${action}ing leave:`, errorMessage);
+      alert(errorMessage);
     }
   };
 
@@ -235,9 +245,11 @@ const PendingLeaves = () => {
                       </p>
                     </div>
                     <span className="px-4 py-2 rounded-xl text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">
-                      {leave.leaveType.charAt(0).toUpperCase() +
-                        leave.leaveType.slice(1)}{" "}
-                      Leave
+                      {leave.leaveType
+                        ? `${leave.leaveType
+                            .charAt(0)
+                            .toUpperCase()}${leave.leaveType.slice(1)} Leave`
+                        : "Leave Request"}
                     </span>
                   </div>
 
@@ -309,31 +321,93 @@ const PendingLeaves = () => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex justify-end items-center gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={() => {
-                        const remarks = prompt("Enter remarks for rejection:");
-                        if (remarks !== null) {
-                          handleAction(leave._id, "reject", remarks);
-                        }
-                      }}
-                      className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
-                    >
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => {
-                        const remarks = prompt("Enter remarks for approval:");
-                        if (remarks !== null) {
-                          handleAction(leave._id, "approve", remarks);
-                        }
-                      }}
-                      className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200"
-                    >
-                      Approve
-                    </button>
+                  {/* Add Review Status Section */}
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Review Status
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Parent Review Status */}
+                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Parent Review
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                              leave.parentReview?.status === "approved"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : leave.parentReview?.status === "rejected"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            }`}
+                          >
+                            {leave.parentReview?.status || "Pending"}
+                          </span>
+                        </div>
+                        {leave.parentReview?.remarks && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Remarks: {leave.parentReview.remarks}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Staff Review Status */}
+                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Staff Review
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                              leave.staffReview?.status === "approved"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : leave.staffReview?.status === "rejected"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            }`}
+                          >
+                            {leave.staffReview?.status || "Pending"}
+                          </span>
+                        </div>
+                        {leave.staffReview?.remarks && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Remarks: {leave.staffReview.remarks}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Action Buttons - Only show if staff hasn't reviewed yet */}
+                  {!leave.staffReview?.status && (
+                    <div className="flex justify-end items-center gap-4 p-4 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={() => {
+                          const remarks = prompt(
+                            "Enter remarks for rejection:"
+                          );
+                          if (remarks !== null) {
+                            handleAction(leave._id, "reject", remarks);
+                          }
+                        }}
+                        className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => {
+                          const remarks = prompt("Enter remarks for approval:");
+                          if (remarks !== null) {
+                            handleAction(leave._id, "approve", remarks);
+                          }
+                        }}
+                        className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

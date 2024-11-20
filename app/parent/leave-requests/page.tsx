@@ -1,7 +1,7 @@
 "use client";
 import { API_BASE_URL } from "@/app/config/api";
 import React, { useEffect, useState } from "react";
-import { getToken } from "@/app/utils/auth";
+import { getToken, hasRole } from "@/app/utils/auth";
 import { useRouter } from "next/navigation";
 
 interface Review {
@@ -36,16 +36,25 @@ interface Leave {
   };
 }
 
-const AllLeaves = () => {
+const ParentLeaveRequests = () => {
   const [leaves, setLeaves] = useState<Leave[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    // Check if user is parent
+    if (!hasRole(["parent"])) {
+      router.push("/login");
+      return;
+    }
+    fetchLeaves();
+  }, [router]);
+
   const fetchLeaves = async () => {
     try {
       const token = getToken();
-      const response = await fetch(`${API_BASE_URL}/api/staff/leaves`, {
+      const response = await fetch(`${API_BASE_URL}/api/parent/child-leaves`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -68,29 +77,48 @@ const AllLeaves = () => {
     }
   };
 
-  useEffect(() => {
-    fetchLeaves();
-  }, []);
+  const handleAction = async (
+    leaveId: string,
+    action: "approve" | "reject",
+    remarks: string
+  ) => {
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${API_BASE_URL}/api/parent/leaves/${leaveId}/review`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action, remarks }),
+        }
+      );
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800";
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Failed to ${action} leave`);
+      }
+
+      alert(data.message || `Leave ${action}ed successfully`);
+      fetchLeaves();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : `Failed to ${action} leave`;
+      console.error(`Error ${action}ing leave:`, errorMessage);
+      alert(errorMessage);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {/* Navigation */}
       <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-              All Leave Applications
+              Leave Requests
             </h1>
             <button
               onClick={() => router.back()}
@@ -120,7 +148,7 @@ const AllLeaves = () => {
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">
-              Loading leave applications...
+              Loading leave requests...
             </p>
           </div>
         ) : error ? (
@@ -153,9 +181,9 @@ const AllLeaves = () => {
           </div>
         ) : leaves.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-            <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+            <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-green-600 dark:text-green-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -164,15 +192,15 @@ const AllLeaves = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  d="M5 13l4 4L19 7"
                 />
               </svg>
             </div>
             <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-              No leaves found
+              No Leave Requests
             </h3>
             <p className="mt-2 text-gray-500 dark:text-gray-400">
-              There are no leave applications to display.
+              There are no leave requests to review at this time.
             </p>
           </div>
         ) : (
@@ -195,88 +223,63 @@ const AllLeaves = () => {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {leave.studentId?.firstName || "Unknown"}{" "}
-                            {leave.studentId?.lastName || "Student"}
+                            {leave.studentId?.firstName}{" "}
+                            {leave.studentId?.lastName}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {leave.studentId?.email || "No email provided"}
+                            Applied on:{" "}
+                            {new Date(leave.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span
-                        className={`px-4 py-1.5 rounded-full text-sm font-medium ${getStatusColor(
-                          leave.status
-                        )}`}
-                      >
-                        {leave.status.charAt(0).toUpperCase() +
-                          leave.status.slice(1)}
-                      </span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Applied on:{" "}
-                        {new Date(leave.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
+                    <span className="px-4 py-2 rounded-xl text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">
+                      {leave.leaveType
+                        ? `${leave.leaveType
+                            .charAt(0)
+                            .toUpperCase()}${leave.leaveType.slice(1)} Leave`
+                        : "Leave Request"}
+                    </span>
                   </div>
 
-                  {/* Leave Details Grid */}
+                  {/* Leave Details */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Column */}
                     <div className="space-y-4">
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Leave Details
+                          Duration
                         </h4>
-                        <div className="space-y-2">
-                          <p className="text-gray-900 dark:text-white flex justify-between">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              Type:
-                            </span>
-                            <span className="font-medium">
-                              {leave.leaveType.charAt(0).toUpperCase() +
-                                leave.leaveType.slice(1)}
-                            </span>
-                          </p>
-                          <p className="text-gray-900 dark:text-white flex justify-between">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              Duration:
-                            </span>
-                            <span className="font-medium">
-                              {new Date(leave.startDate).toLocaleDateString()} -{" "}
-                              {new Date(leave.endDate).toLocaleDateString()}
-                            </span>
-                          </p>
-                        </div>
+                        <p className="text-gray-900 dark:text-white">
+                          {new Date(leave.startDate).toLocaleDateString()} -{" "}
+                          {new Date(leave.endDate).toLocaleDateString()}
+                        </p>
                       </div>
-
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Contact Information
+                          Reason
                         </h4>
-                        <div className="space-y-2">
-                          <p className="text-gray-900 dark:text-white flex justify-between">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              Student:
-                            </span>
-                            <span className="font-medium">
-                              {leave.contactNumber}
-                            </span>
-                          </p>
-                          <p className="text-gray-900 dark:text-white flex justify-between">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              Parent:
-                            </span>
-                            <span className="font-medium">
-                              {leave.parentContact}
-                            </span>
-                          </p>
-                        </div>
+                        <p className="text-gray-900 dark:text-white">
+                          {leave.reason}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Right Column */}
                     <div className="space-y-4">
+                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Contact Details
+                        </h4>
+                        <div className="space-y-2">
+                          <p className="text-gray-900 dark:text-white flex justify-between">
+                            <span>Student:</span>
+                            <span>{leave.contactNumber}</span>
+                          </p>
+                          <p className="text-gray-900 dark:text-white flex justify-between">
+                            <span>Parent:</span>
+                            <span>{leave.parentContact}</span>
+                          </p>
+                        </div>
+                      </div>
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Address During Leave
@@ -285,34 +288,28 @@ const AllLeaves = () => {
                           {leave.address}
                         </p>
                       </div>
-
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Reason for Leave
-                        </h4>
-                        <p className="text-gray-900 dark:text-white">
-                          {leave.reason}
-                        </p>
-                      </div>
                     </div>
                   </div>
 
-                  {/* Review Status Section */}
+                  {/* Review Status */}
                   <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                       Review Status
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Parent Review Status */}
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600 dark:text-gray-400">
                             Parent Review
                           </span>
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-lg ${getStatusColor(
-                              leave.parentReview?.status || "pending"
-                            )}`}
+                            className={`px-2 py-1 text-xs font-medium rounded-lg ${
+                              leave.parentReview?.status === "approved"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : leave.parentReview?.status === "rejected"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            }`}
                           >
                             {leave.parentReview?.status || "Pending"}
                           </span>
@@ -322,26 +319,21 @@ const AllLeaves = () => {
                             Remarks: {leave.parentReview.remarks}
                           </p>
                         )}
-                        {leave.parentReview?.reviewedAt && (
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Reviewed on:{" "}
-                            {new Date(
-                              leave.parentReview.reviewedAt
-                            ).toLocaleDateString()}
-                          </p>
-                        )}
                       </div>
 
-                      {/* Staff Review Status */}
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-600 dark:text-gray-400">
                             Staff Review
                           </span>
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-lg ${getStatusColor(
-                              leave.staffReview?.status || "pending"
-                            )}`}
+                            className={`px-2 py-1 text-xs font-medium rounded-lg ${
+                              leave.staffReview?.status === "approved"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : leave.staffReview?.status === "rejected"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                            }`}
                           >
                             {leave.staffReview?.status || "Pending"}
                           </span>
@@ -351,17 +343,39 @@ const AllLeaves = () => {
                             Remarks: {leave.staffReview.remarks}
                           </p>
                         )}
-                        {leave.staffReview?.reviewedAt && (
-                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Reviewed on:{" "}
-                            {new Date(
-                              leave.staffReview.reviewedAt
-                            ).toLocaleDateString()}
-                          </p>
-                        )}
                       </div>
                     </div>
                   </div>
+
+                  {/* Action Buttons - Only show if parent hasn't reviewed yet */}
+                  {!leave.parentReview?.status && (
+                    <div className="flex justify-end gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={() => {
+                          const remarks = prompt(
+                            "Enter remarks for rejection:"
+                          );
+                          if (remarks !== null) {
+                            handleAction(leave._id, "reject", remarks);
+                          }
+                        }}
+                        className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 transition-all duration-200"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => {
+                          const remarks = prompt("Enter remarks for approval:");
+                          if (remarks !== null) {
+                            handleAction(leave._id, "approve", remarks);
+                          }
+                        }}
+                        className="px-6 py-2.5 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 transition-all duration-200"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -372,4 +386,4 @@ const AllLeaves = () => {
   );
 };
 
-export default AllLeaves;
+export default ParentLeaveRequests;
