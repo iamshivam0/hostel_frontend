@@ -32,7 +32,7 @@ export default function ApplyLeave() {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/student/leaves`, {
+      const response = await fetch(`${API_BASE_URL}/api/student/leaves/apply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
