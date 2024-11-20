@@ -13,6 +13,7 @@ import {
   changestaffPassword,
 } from "../controllers/staff.controller.js";
 import { getComplaints } from "../controllers/Complaints.controller.js";
+import { validateLeaveReview } from "../middleware/leave.middleware.js";
 
 const router = express.Router();
 
@@ -34,27 +35,28 @@ router.get(
 
 // Leave management routes
 router.get(
+  "/leaves",
+  authenticateToken,
+  authorizeRoles(["staff"]),
+  getAllLeaves
+);
+
+router.get(
   "/leaves/pending",
-  authenticateToken as any,
+  authenticateToken,
   authorizeRoles(["staff"]),
   getPendingLeaves
 );
 
 router.post(
   "/leaves/:leaveId/review",
-  authenticateToken as any,
+  authenticateToken,
   authorizeRoles(["staff"]),
+  validateLeaveReview,
   reviewLeave
 );
 
 // Other routes remain the same...
-router.get(
-  "/leaves",
-  authenticateToken as any,
-  authorizeRoles(["staff"]),
-  getAllLeaves
-);
-
 router.get(
   "/leave-stats",
   authenticateToken as any,
