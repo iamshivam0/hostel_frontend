@@ -41,7 +41,7 @@ export default function ComplaintsPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/parent/getcomplaints`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/parent/complaints`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

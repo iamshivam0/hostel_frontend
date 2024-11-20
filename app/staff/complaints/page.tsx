@@ -7,15 +7,14 @@ import { User } from "@/app/types/user";
 
 interface ComplaintType {
   _id: string;
-  student: string;
   description: string;
   status: "Pending" | "Resolved";
+  type: "Maintenance" | "Disciplinary" | "Other";
   studentDetails: {
     firstName: string;
     roomNumber: string;
   };
   createdAt: string;
-  updatedAt: string;
 }
 
 export default function ComplaintsPage() {
@@ -24,6 +23,9 @@ export default function ComplaintsPage() {
   const [complaints, setComplaints] = useState<ComplaintType[]>([]);
   const [loading, setLoading] = useState(true);
   const [user] = useState<User | null>(getUser() as User | null);
+  const [sortBy, setSortBy] = useState<
+    "all" | "Maintenance" | "Disciplinary" | "Other"
+  >("all");
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
@@ -76,6 +78,11 @@ export default function ComplaintsPage() {
     }
   };
 
+  const getSortedComplaints = () => {
+    if (sortBy === "all") return complaints;
+    return complaints.filter((complaint) => complaint.type === sortBy);
+  };
+
   if (!user) return null;
 
   return (
@@ -126,6 +133,34 @@ export default function ComplaintsPage() {
 
         {/* Complaints Table */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-wrap gap-3">
+              {["all", "Maintenance", "Disciplinary", "Other"].map((type) => (
+                <button
+                  key={type}
+                  onClick={() =>
+                    setSortBy(
+                      type as "all" | "Maintenance" | "Disciplinary" | "Other"
+                    )
+                  }
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+                    ${
+                      sortBy === type
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {type === "Maintenance" && "🔧"}
+                    {type === "Disciplinary" && "⚠️"}
+                    {type === "Other" && "📝"}
+                    {type === "all" && "👀"}
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900/50">
@@ -140,6 +175,9 @@ export default function ComplaintsPage() {
                     Room Number
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Description
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -147,9 +185,9 @@ export default function ComplaintsPage() {
                   </th>
                 </tr>
               </thead>
-              {complaints.length > 0 ? (
+              {getSortedComplaints().length > 0 ? (
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {complaints.map((complaint, index) => (
+                  {getSortedComplaints().map((complaint, index) => (
                     <tr
                       key={`${complaint._id}-${index}`}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
@@ -162,6 +200,14 @@ export default function ComplaintsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {complaint.studentDetails?.roomNumber || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <span className="inline-flex items-center">
+                          {complaint.type === "Maintenance" && "🔧"}
+                          {complaint.type === "Disciplinary" && "⚠️"}
+                          {complaint.type === "Other" && "📝"}
+                          {complaint.type}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">
                         {complaint.description}
@@ -182,7 +228,7 @@ export default function ComplaintsPage() {
                 <tbody>
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
                       No complaints found

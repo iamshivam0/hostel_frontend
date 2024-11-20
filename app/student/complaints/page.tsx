@@ -9,6 +9,7 @@ interface ComplaintType {
   _id: string;
   description: string;
   status: "Pending" | "Resolved";
+  type: "Maintenance" | "Disciplinary" | "Other";
   studentDetails: {
     firstName: string;
     roomNumber: string;
@@ -85,9 +86,13 @@ export default function ComplaintsPage() {
   const [loading, setLoading] = useState(true);
   const [user] = useState<User | null>(getUser() as User | null);
   const [description, setDescription] = useState("");
+  const [type, setType] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingComplaint, setEditingComplaint] =
     useState<ComplaintType | null>(null);
+  const [sortBy, setSortBy] = useState<
+    "all" | "Maintenance" | "Disciplinary" | "Other"
+  >("all");
 
   useEffect(() => {
     if (!user || !hasRole(["student"])) {
@@ -140,7 +145,7 @@ export default function ComplaintsPage() {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ description }),
+          body: JSON.stringify({ description, type }),
         }
       );
 
@@ -201,7 +206,7 @@ export default function ComplaintsPage() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/student/complaint-update/${complaintId}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -227,7 +232,7 @@ export default function ComplaintsPage() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/student/complaint-update/${id}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -245,6 +250,11 @@ export default function ComplaintsPage() {
     } catch (error) {
       console.error("Failed to update complaint:", error);
     }
+  };
+
+  const getSortedComplaints = () => {
+    if (sortBy === "all") return complaints;
+    return complaints.filter((complaint) => complaint.type === sortBy);
   };
 
   if (!user) return null;
@@ -299,6 +309,29 @@ export default function ComplaintsPage() {
         <div className="mb-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+              <div className="flex flex-wrap gap-3 mb-4">
+                {["Maintenance", "Disciplinary", "Other"].map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setType(option)}
+                    className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 
+                      ${
+                        type === option
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105 border-transparent"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                      }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      {option === "Maintenance" && "🔧"}
+                      {option === "Disciplinary" && "⚠️"}
+                      {option === "Other" && "📝"}
+                      {option}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -306,6 +339,7 @@ export default function ComplaintsPage() {
                 className="w-full h-32 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -320,9 +354,37 @@ export default function ComplaintsPage() {
         {/* Complaints List */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Your Complaints
-            </h3>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Your Complaints
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {["all", "Maintenance", "Disciplinary", "Other"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() =>
+                      setSortBy(
+                        type as "all" | "Maintenance" | "Disciplinary" | "Other"
+                      )
+                    }
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+                      ${
+                        sortBy === type
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                      }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      {type === "Maintenance" && "🔧"}
+                      {type === "Disciplinary" && "⚠️"}
+                      {type === "Other" && "📝"}
+                      {type === "all" && "👀"}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -330,6 +392,9 @@ export default function ComplaintsPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Description
@@ -343,13 +408,21 @@ export default function ComplaintsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {complaints.map((complaint) => (
+                {getSortedComplaints().map((complaint) => (
                   <tr
                     key={complaint._id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {new Date(complaint.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <span className="inline-flex items-center">
+                        {complaint.type === "Maintenance" && "🔧"}
+                        {complaint.type === "Disciplinary" && "⚠️"}
+                        {complaint.type === "Other" && "📝"}
+                        {complaint.type}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                       {complaint.description}
