@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import Leave from "../models/leave.model.js";
 
 export const createAdmin = async (req: Request, res: Response) => {
   try {
@@ -403,5 +404,20 @@ export const createStaff = async (req: Request, res: Response) => {
       message: "Error creating staff",
       error: error.message,
     });
+  }
+};
+
+export const getleaves = async (req: Request, res: Response) => {
+  try {
+    const leaves = await Leave.find({})
+      .sort({ createdAt: -1 })
+      .populate("studentId", "firstName lastName email")
+      .populate("parentReview.reviewedBy", "firstName lastName")
+      .populate("staffReview.reviewedBy", "firstName lastName");
+
+    res.json(leaves);
+  } catch (error) {
+    console.error("Error fetching leaves:", error);
+    res.status(500).json({ message: "Failed to fetch leaves" });
   }
 };

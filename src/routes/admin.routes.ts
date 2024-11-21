@@ -15,6 +15,7 @@ import {
   deleteParent,
   createAdmin,
   getstaff,
+  getleaves,
   createStaff,
 } from "../controllers/admin.controller.js";
 import {
@@ -50,5 +51,9 @@ router.delete("/deletecomplaint/:id", deleteComplaint);
 // staff management
 router.get("/getallstaffs", getstaff);
 router.post("/staff-create", createStaff);
+
+//leave management
+
+router.get("/getallleaves", getleaves);
 
 export default router;
