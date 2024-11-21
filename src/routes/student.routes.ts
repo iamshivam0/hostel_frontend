@@ -121,9 +121,13 @@ router.post(
   uploadProfilePicture
 );
 
-
 //mess-controls
 
-router.get("/mess-menu",authorizeRoles(["student"]),getMessPhoto);
+router.get(
+  "/mess-menu",
+  authenticateToken,
+  authorizeRoles(["student"]),
+  getMessPhoto
+);
 
 export default router;

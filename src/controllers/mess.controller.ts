@@ -1,17 +1,13 @@
 import { Request, Response } from "express";
 import { v2 as cloudinary } from "cloudinary";
 import { MessPhoto } from "../models/mess.model.js";
-import User  from "../models/user.model.js";
+import User from "../models/user.model.js";
 
 // Staff or Admin uploads/replaces a photo
 export const uploadMessPhoto = async (req: Request, res: Response) => {
   const { description } = req.body;
   const userId = req.user?._id;
-  const role = req.user?.role; 
-// console.log(description);
-// console.log(userId);
-// console.log(userId);
-  // Check permissions
+  const role = req.user?.role;
   if (role !== "admin" && role !== "staff") {
     return res.status(403).json({ message: "Permission denied." });
   }
@@ -49,9 +45,16 @@ export const uploadMessPhoto = async (req: Request, res: Response) => {
     }
 
     await messPhoto.save();
-    res.status(200).json({ message: "Photo uploaded successfully.", messPhoto });
+    res
+      .status(200)
+      .json({ message: "Photo uploaded successfully.", messPhoto });
   } catch (err) {
-    res.status(500).json({ message: "Error uploading photo.", error: err instanceof Error ? err.message : "Unknown error", });
+    res
+      .status(500)
+      .json({
+        message: "Error uploading photo.",
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
   }
 };
 
@@ -59,11 +62,17 @@ export const uploadMessPhoto = async (req: Request, res: Response) => {
 export const getMessPhoto = async (req: Request, res: Response) => {
   try {
     const messPhoto = await MessPhoto.findOne();
-    if (!messPhoto) return res.status(404).json({ message: "No mess photo found." });
+    if (!messPhoto)
+      return res.status(404).json({ message: "No mess photo found." });
 
     res.status(200).json(messPhoto);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching mess photo.", error: err instanceof Error ? err.message : "Unknown error", });
+    res
+      .status(500)
+      .json({
+        message: "Error fetching mess photo.",
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
   }
 };
 
@@ -77,7 +86,8 @@ export const deleteMessPhoto = async (req: Request, res: Response) => {
 
   try {
     const messPhoto = await MessPhoto.findOne();
-    if (!messPhoto) return res.status(404).json({ message: "No mess photo found." });
+    if (!messPhoto)
+      return res.status(404).json({ message: "No mess photo found." });
 
     // Delete from Cloudinary
     await cloudinary.uploader.destroy(messPhoto.publicId);
@@ -87,6 +97,11 @@ export const deleteMessPhoto = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Mess photo deleted successfully." });
   } catch (err) {
-    res.status(500).json({ message: "Error deleting photo.",error: err instanceof Error ? err.message : "Unknown error", });
+    res
+      .status(500)
+      .json({
+        message: "Error deleting photo.",
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
   }
 };
