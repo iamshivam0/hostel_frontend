@@ -353,7 +353,7 @@ export const getstaff = async (req: Request, res: Response) => {
       .lean();
 
     res.status(200).json(staff);
-    console.log(await User.find({ role: "staff" }));
+    // console.log(await User.find({ role: "staff" }));
   } catch (error: any) {
     return res.status(500).json({
       success: false,
