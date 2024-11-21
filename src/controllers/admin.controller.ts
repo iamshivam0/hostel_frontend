@@ -407,6 +407,33 @@ export const createStaff = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteStaff = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const staff = await User.findOne({ _id: id, role: "staff" });
+    if (!staff) {
+      return res.status(404).json({
+        success: false,
+        message: "staff not found",
+      });
+    }
+
+    await staff.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "staff deleted successfully",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting staff",
+      error: error.message,
+    });
+  }
+};
+
 export const getleaves = async (req: Request, res: Response) => {
   try {
     const leaves = await Leave.find({})
