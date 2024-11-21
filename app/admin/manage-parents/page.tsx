@@ -249,16 +249,6 @@ export default function ManageParents() {
             </p>
           </button>
         </div>
-
-        {/* Current Assignments Table */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-            Current Parent-Student Assignments
-          </h2>
-          <div className="overflow-x-auto">
-            {/* ... rest of the table code remains the same ... */}
-          </div>
-        </div>
       </main>
 
       {/* Assign Parent Modal */}
