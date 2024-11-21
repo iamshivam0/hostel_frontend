@@ -7,23 +7,34 @@ import { User } from "@/app/types/user";
 
 interface ComplaintType {
   _id: string;
-  student: string;
   description: string;
   status: "Pending" | "Resolved";
+  type: "Maintenance" | "Disciplinary" | "Other";
   studentDetails: {
     firstName: string;
     roomNumber: string;
   };
   createdAt: string;
-  updatedAt: string;
 }
-//iamshivam0
+
 export default function ComplaintsPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [complaints, setComplaints] = useState<ComplaintType[]>([]);
   const [loading, setLoading] = useState(true);
   const [user] = useState<User | null>(getUser() as User | null);
+  const [sortBy, setSortBy] = useState<
+    "all" | "Maintenance" | "Disciplinary" | "Other"
+  >("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "Pending" | "Resolved"
+  >("all");
+  const [dateFilter, setDateFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
@@ -76,6 +87,91 @@ export default function ComplaintsPage() {
     }
   };
 
+  const getSortedComplaints = () => {
+    if (sortBy === "all") return complaints;
+    return complaints.filter((complaint) => complaint.type === sortBy);
+  };
+
+  const getFilteredComplaints = () => {
+    let filtered = [...complaints];
+
+    if (sortBy !== "all") {
+      filtered = filtered.filter((complaint) => complaint.type === sortBy);
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(
+        (complaint) => complaint.status === statusFilter
+      );
+    }
+
+    if (dateFilter !== "all") {
+      const now = new Date();
+      const today = new Date(now.setHours(0, 0, 0, 0));
+      filtered = filtered.filter((complaint) => {
+        const complaintDate = new Date(complaint.createdAt);
+        switch (dateFilter) {
+          case "today":
+            return complaintDate >= today;
+          case "week":
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            return complaintDate >= weekAgo;
+          case "month":
+            const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+            return complaintDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (complaint) =>
+          complaint.description
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          complaint.studentDetails?.firstName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          complaint.studentDetails?.roomNumber
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
+  };
+
+  const filteredComplaints = getFilteredComplaints();
+  const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
+  const paginatedComplaints = filteredComplaints.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const FilterButton = ({
+    active,
+    onClick,
+    children,
+  }: {
+    active: boolean;
+    onClick: () => void;
+    children: React.ReactNode;
+  }) => (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
+        ${
+          active
+            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+            : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+        }`}
+    >
+      {children}
+    </button>
+  );
+
   if (!user) return null;
 
   return (
@@ -92,7 +188,7 @@ export default function ComplaintsPage() {
                 |
               </span>
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                admin Portal
+                Admin Portal
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -124,6 +220,92 @@ export default function ComplaintsPage() {
           </div>
         </div>
 
+        {/* Filter Section */}
+        <div className="mb-6 space-y-4">
+          {/* Search */}
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Search complaints..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4">
+            {/* Type Filters */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Type
+              </label>
+              <div className="flex gap-2">
+                {["all", "Maintenance", "Disciplinary", "Other"].map((type) => (
+                  <FilterButton
+                    key={type}
+                    active={sortBy === type}
+                    onClick={() => setSortBy(type as typeof sortBy)}
+                  >
+                    <span className="flex items-center gap-2">
+                      {type === "Maintenance" && "🔧"}
+                      {type === "Disciplinary" && "⚠️"}
+                      {type === "Other" && "📝"}
+                      {type === "all" && "👀"}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                  </FilterButton>
+                ))}
+              </div>
+            </div>
+
+            {/* Status Filters */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Status
+              </label>
+              <div className="flex gap-2">
+                {["all", "Pending", "Resolved"].map((status) => (
+                  <FilterButton
+                    key={status}
+                    active={statusFilter === status}
+                    onClick={() =>
+                      setStatusFilter(status as typeof statusFilter)
+                    }
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </FilterButton>
+                ))}
+              </div>
+            </div>
+
+            {/* Date Filters */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Date
+              </label>
+              <div className="flex gap-2">
+                {[
+                  { value: "all", label: "All Time" },
+                  { value: "today", label: "Today" },
+                  { value: "week", label: "This Week" },
+                  { value: "month", label: "This Month" },
+                ].map((option) => (
+                  <FilterButton
+                    key={option.value}
+                    active={dateFilter === option.value}
+                    onClick={() =>
+                      setDateFilter(option.value as typeof dateFilter)
+                    }
+                  >
+                    {option.label}
+                  </FilterButton>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Complaints Table */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
@@ -140,6 +322,9 @@ export default function ComplaintsPage() {
                     Room Number
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Description
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -147,9 +332,9 @@ export default function ComplaintsPage() {
                   </th>
                 </tr>
               </thead>
-              {complaints.length > 0 ? (
+              {paginatedComplaints.length > 0 ? (
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {complaints.map((complaint, index) => (
+                  {paginatedComplaints.map((complaint, index) => (
                     <tr
                       key={`${complaint._id}-${index}`}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
@@ -162,6 +347,14 @@ export default function ComplaintsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {complaint.studentDetails?.roomNumber || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <span className="inline-flex items-center">
+                          {complaint.type === "Maintenance" && "🔧"}
+                          {complaint.type === "Disciplinary" && "⚠️"}
+                          {complaint.type === "Other" && "📝"}
+                          {complaint.type}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">
                         {complaint.description}
@@ -182,7 +375,7 @@ export default function ComplaintsPage() {
                 <tbody>
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
                       No complaints found
@@ -193,6 +386,31 @@ export default function ComplaintsPage() {
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex justify-center gap-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-1">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );

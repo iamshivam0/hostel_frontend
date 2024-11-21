@@ -7,19 +7,18 @@ import { useTheme } from "@/app/providers/theme-provider";
 import { API_BASE_URL } from "@/app/config/api";
 import { toast } from "react-hot-toast";
 
-interface Staff {
+interface student {
   _id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: string;
-  department?: string;
 }
 
-export default function ManageStaff() {
+export default function Managestudent() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [staff, setStaff] = useState<Staff[]>([]);
+  const [student, setstudent] = useState<student[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +44,7 @@ export default function ManageStaff() {
                 |
               </span>
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Staff Management
+                student Management
               </span>
             </div>
             <button
@@ -62,9 +61,9 @@ export default function ManageStaff() {
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
-            <h2 className="text-3xl font-bold mb-2">Staff Management 👥</h2>
+            <h2 className="text-3xl font-bold mb-2">student Management 👥</h2>
             <p className="text-blue-100">
-              Manage staff members, roles, and departments
+              Manage student members, roles, and departments
             </p>
           </div>
         </div>
@@ -75,7 +74,7 @@ export default function ManageStaff() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <button
-            onClick={() => router.push("/admin/manage-staff/add-staff")}
+            onClick={() => router.push("/admin/manage-students/add-student")}
             className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
@@ -94,42 +93,15 @@ export default function ManageStaff() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Add New Staff
+              Add New student
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Register a new staff member
+              Register a new student member
             </p>
           </button>
 
           <button
-            onClick={() => router.push("/admin/manage-staff/departments")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
-          >
-            <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
-              <svg
-                className="w-8 h-8 text-green-600 dark:text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Manage Departments
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Organize staff departments
-            </p>
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/manage-staff/view-staff")}
+            onClick={() => router.push("/admin/manage-students/view-student")}
             className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
@@ -148,15 +120,15 @@ export default function ManageStaff() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              View All Staff
+              View All student
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              See all staff members and their roles
+              See all student members and their roles
             </p>
           </button>
         </div>
 
-        {/* Staff List Table */}
+        {/* student List Table */}
       </main>
     </div>
   );
