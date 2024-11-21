@@ -59,7 +59,7 @@ export default function ViewStaff() {
   const handleDeleteStaff = async (staffId: string) => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/staff/${staffId}`,
+        `${API_BASE_URL}/api/admin/delete-staff/${staffId}`,
         {
           method: "DELETE",
           headers: {
@@ -70,8 +70,11 @@ export default function ViewStaff() {
 
       const data = await response.json();
       if (data.success) {
-        toast.success("Staff member deleted successfully");
-        fetchStaffMembers();
+        // Show success toast with staff member's name
+        toast.success(
+          `Staff member ${selectedStaff?.firstName} ${selectedStaff?.lastName} has been deleted successfully`
+        );
+        fetchStaffMembers(); // Refresh the list
         setShowDeleteModal(false);
         setSelectedStaff(null);
       } else {
