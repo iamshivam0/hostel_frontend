@@ -14,8 +14,11 @@ import {
 } from "../controllers/staff.controller.js";
 import { getComplaints } from "../controllers/Complaints.controller.js";
 import { validateLeaveReview } from "../middleware/leave.middleware.js";
-
+import { configureMulter } from "../middleware/upload.middleware.js";
+import { getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
 const router = express.Router();
+
+const messUpload = configureMulter("mess_photos");
 
 // Add interface for authenticated request
 interface AuthenticatedRequest extends express.Request {
@@ -85,4 +88,13 @@ router.get(
   getComplaints
 );
 
+// mess-controls
+
+router.post("/upload-mess-menu", authenticateToken as any,
+  authorizeRoles(["staff"]),
+  messUpload.single("messPhoto"),
+  uploadMessPhoto);
+router.get("/mess-menu",authenticateToken as any,
+  authorizeRoles(["staff"]),
+  getMessPhoto);
 export default router;

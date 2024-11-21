@@ -23,9 +23,12 @@ import {
   deleteComplaint,
   getComplaints,
 } from "../controllers/Complaints.controller.js";
+import { configureMulter } from "../middleware/upload.middleware.js";
+import { deleteMessPhoto, getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
 
 const router = express.Router();
 
+const messUpload = configureMulter("mess_photos");
 // Protect all admin routes
 router.use(authenticateToken, authorizeRoles(["admin"]));
 
@@ -57,5 +60,11 @@ router.delete("/delete-staff/:id", deleteStaff);
 //leave management
 
 router.get("/getallleaves", getleaves);
+
+//Mess-upload 
+
+router.post("/upload-mess-menu", messUpload.single("messPhoto"),uploadMessPhoto);
+router.get("/mess-menu",getMessPhoto);
+router.delete("/delete-menu", deleteMessPhoto);
 
 export default router;

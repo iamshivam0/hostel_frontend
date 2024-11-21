@@ -20,8 +20,11 @@ import {
   updateComplaint,
   deleteStudentComplaint,
 } from "../controllers/Complaints.controller.js";
-import multer from "multer";
-const upload = multer({ dest: "uploads/" });
+import { configureMulter } from "../middleware/upload.middleware.js"; // Import the multer configuration
+import { getMessPhoto } from "../controllers/mess.controller.js";
+
+// Configure multer for profile photos
+const profileUpload = configureMulter("profile_photos");
 
 const router = express.Router();
 
@@ -75,7 +78,7 @@ router.get(
   getStudentDashboard
 );
 
-// roomates route
+// Roommates route
 router.get(
   "/roommates",
   authenticateToken,
@@ -109,14 +112,18 @@ router.delete(
   deleteStudentComplaint
 );
 
-
-//profile routes
+// Profile picture upload route
 router.post(
   "/upload-profile-pic",
   authenticateToken,
   authorizeRoles(["student"]),
-  upload.single("profilePic"),
+  profileUpload.single("profilePic"), // Use the configured profileUpload middleware
   uploadProfilePicture
 );
+
+
+//mess-controls
+
+router.get("/mess-menu",authorizeRoles(["student"]),getMessPhoto);
 
 export default router;
