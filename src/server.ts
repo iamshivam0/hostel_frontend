@@ -9,9 +9,9 @@ import adminRoutes from "./routes/admin.routes.js";
 import parentRoutes from "./routes/parent.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
-import passwordroutes from "./routes/passwordreset.routes.js"
+import passwordroutes from "./routes/passwordreset.routes.js";
 // import complaintRoutes from "./routes/Complaint.routes.js";
-import './config/Cloudinary.js';
+import "./config/Cloudinary.js";
 dotenv.config();
 
 const app = express();
@@ -30,15 +30,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/staff", staffRoutes);
-app.use("/api",passwordroutes);
+app.use("/api/password", passwordroutes);
 // app.use("/api/complaints", complaintRoutes);
 
 // Database connection
 mongoose
-  .connect(
-    process.env.MONGODB_URI ||
-      ""
-  )
+  .connect(process.env.MONGODB_URI || "")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
