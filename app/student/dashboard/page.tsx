@@ -6,6 +6,7 @@ import { getUser, logout, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
+import MenuModal from "@/app/components/MenuModal";
 
 interface Leave {
   _id: string;
@@ -23,6 +24,8 @@ export default function StudentDashboard() {
     total: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [menuImage, setMenuImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !hasRole(["student"])) {
@@ -53,6 +56,33 @@ export default function StudentDashboard() {
     }
   };
 
+  const fetchMenuImage = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/student/mess-menu`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch menu");
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        setMenuImage(data.url);
+      }
+    } catch (error) {
+      console.error("Error fetching menu:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isMenuModalOpen) {
+      fetchMenuImage();
+    }
+  }, [isMenuModalOpen]);
+
   if (!user) return null;
 
   return (
@@ -73,6 +103,12 @@ export default function StudentDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsMenuModalOpen(true)}
+                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                View Menu
+              </button>
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -378,6 +414,12 @@ export default function StudentDashboard() {
           </button>
         </div>
       </main>
+
+      <MenuModal
+        isOpen={isMenuModalOpen}
+        onClose={() => setIsMenuModalOpen(false)}
+        menuUrl={menuImage}
+      />
     </div>
   );
 }

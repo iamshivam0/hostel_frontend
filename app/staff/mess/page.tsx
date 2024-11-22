@@ -17,7 +17,7 @@ const MessPage = () => {
 
   const fetchCurrentMenu = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/mess-menu`, {
+      const response = await fetch(`${API_BASE_URL}/api/staff/mess-menu`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -73,7 +73,7 @@ const MessPage = () => {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/upload-mess-menu`,
+        `${API_BASE_URL}/api/staff/upload-mess-menu`,
         {
           method: "POST",
           body: formData,

@@ -6,6 +6,7 @@ import { getUser, logout, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
+import MenuModal from "@/app/components/MenuModal";
 
 interface LeaveStats {
   pending: number;
@@ -23,6 +24,8 @@ export default function StaffDashboard() {
     total: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [menuImage, setMenuImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !hasRole(["staff"])) {
@@ -54,6 +57,33 @@ export default function StaffDashboard() {
     }
   };
 
+  const fetchMenuImage = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/staff/mess-menu`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch menu");
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        setMenuImage(data.url);
+      }
+    } catch (error) {
+      console.error("Error fetching menu:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isMenuModalOpen) {
+      fetchMenuImage();
+    }
+  }, [isMenuModalOpen]);
+
   if (!user) return null;
 
   return (
@@ -74,6 +104,12 @@ export default function StaffDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsMenuModalOpen(true)}
+                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                View Menu
+              </button>
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -315,8 +351,39 @@ export default function StaffDashboard() {
               View and handle student complaints
             </p>
           </button>
+          <button
+            onClick={() => router.push("/staff/mess")}
+            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+          >
+            <div className="p-4 bg-orange-100 dark:bg-orange-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
+              <svg
+                className="w-8 h-8 text-orange-600 dark:text-orange-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Mess Management
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Manage mess menu and schedules
+            </p>
+          </button>
         </div>
       </main>
+      <MenuModal
+        isOpen={isMenuModalOpen}
+        onClose={() => setIsMenuModalOpen(false)}
+        menuUrl={menuImage}
+      />
     </div>
   );
 }
