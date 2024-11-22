@@ -65,13 +65,13 @@ export const getMessPhoto = async (req: Request, res: Response) => {
     if (!messPhoto)
       return res.status(404).json({ message: "No mess photo found." });
 
+    res.status(200).json(messPhoto);
     if (!messPhoto.publicId || typeof messPhoto.publicId !== "string") {
       return res.status(500).json({
         message: "Invalid photo data: Missing or invalid publicId",
         messPhoto,
       });
     }
-    res.status(200).json(messPhoto);
   } catch (err) {
     res
       .status(500)

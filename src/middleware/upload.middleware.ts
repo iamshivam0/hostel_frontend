@@ -1,26 +1,17 @@
 import multer from "multer";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Simulate __dirname for ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/Cloudinary.js";
 
 export const configureMulter = (folder: string) => {
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      const uploadPath = path.join(__dirname, `../uploads/${folder}`);
-      // Check if the directory exists, and create it if not
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
-      }
-      cb(null, uploadPath);
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: async (req: Request, file: Express.Multer.File) => {
+      return {
+        folder: folder, // Set the folder dynamically
+        format: "jpeg", // Optionally specify allowed format (e.g., "jpeg", "png", etc.)
+        public_id: `${Date.now()}-${file.originalname}`, // Unique public ID
+      };
     },
-    filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`);
-    },
-  });
-
+  })
   return multer({ storage });
 };
