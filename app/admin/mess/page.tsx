@@ -102,7 +102,7 @@ const MessPage = () => {
       // console.log("Upload Response Data:", data);
 
       if (data.messPhoto.url) {
-        console.log("New Menu Image URL:", data.url);
+        console.log("New Menu Image URL:", data.messPhoto.url);
         setMenuImage(data.messPhoto.url);
         alert("Menu uploaded successfully");
       } else {
