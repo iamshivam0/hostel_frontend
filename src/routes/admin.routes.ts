@@ -25,10 +25,13 @@ import {
 } from "../controllers/Complaints.controller.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { deleteMessPhoto, getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
+import { requestPasswordReset, resetPassword } from "../controllers/student.controller.js";
 
 const router = express.Router();
 
 const messUpload = configureMulter("mess_photos");
+
+
 // Protect all admin routes
 router.use(authenticateToken, authorizeRoles(["admin"]));
 

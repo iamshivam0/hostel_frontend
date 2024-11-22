@@ -9,6 +9,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import parentRoutes from "./routes/parent.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
+import passwordroutes from "./routes/passwordreset.routes.js"
 // import complaintRoutes from "./routes/Complaint.routes.js";
 import './config/Cloudinary.js';
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/parent", parentRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api",passwordroutes);
 // app.use("/api/complaints", complaintRoutes);
 
 // Database connection

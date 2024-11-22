@@ -16,6 +16,7 @@ import { getComplaints } from "../controllers/Complaints.controller.js";
 import { validateLeaveReview } from "../middleware/leave.middleware.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
+import { requestPasswordReset, resetPassword } from "../controllers/student.controller.js";
 const router = express.Router();
 
 const messUpload = configureMulter("mess_photos");
@@ -97,4 +98,5 @@ router.post("/upload-mess-menu", authenticateToken as any,
 router.get("/mess-menu",authenticateToken as any,
   authorizeRoles(["staff"]),
   getMessPhoto);
+
 export default router;

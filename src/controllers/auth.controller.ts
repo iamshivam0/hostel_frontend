@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
+
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -13,7 +13,10 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check password
+    console.log('Stored hashed password:', user.password); // Log the stored password hash
+    console.log('Entered password:', password); // Log the entered password
+
+    // Check password (using the model's comparePassword method)
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -26,15 +29,12 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: "24h" }
     );
 
-    // Include roomNumber in response if user is a student
     const userData = {
       id: user._id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      ...(user.role === "student" && { roomNumber: user.roomNumber }), // Include roomNumber only for students
-      ...(user.role === "student" && { parentId: user.parentId }), // Include parentId only for students
     };
 
     res.json({
@@ -46,6 +46,7 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Login failed" });
   }
 };
+
 
 export const register = async (req: Request, res: Response) => {
   try {

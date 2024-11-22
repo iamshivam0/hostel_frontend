@@ -11,6 +11,8 @@ export interface IUser extends mongoose.Document {
   parentId?: mongoose.Types.ObjectId;
   children?: mongoose.Types.ObjectId[];
   profilePicUrl?: string; // Optional field for profile picture
+  resetPasswordToken?: string; 
+  resetPasswordExpires?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -76,8 +78,16 @@ const userSchema = new mongoose.Schema(
     ],
     profilePicUrl: {
       type: String,
-      default: null, // Default to null if no profile picture is uploaded
+      default: null,
       trim: true,
+    },
+    resetPasswordToken: {
+      type: String,
+      default: null, // Default to null if no token is generated
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: null, // Default to null if no expiration is set
     },
   },
   {
@@ -85,9 +95,10 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+
 // Hash password before saving
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return next();  // Only hash if password is modified
 
   try {
     const salt = await bcrypt.genSalt(10);
