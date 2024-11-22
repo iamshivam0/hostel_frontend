@@ -12,6 +12,7 @@ const MessPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Fetching current menu...");
     fetchCurrentMenu();
   }, []);
 
@@ -23,16 +24,25 @@ const MessPage = () => {
         },
       });
 
+      // console.log("API Response Status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Error Response Data:", errorData);
         throw new Error(errorData.message || "Failed to fetch menu");
       }
 
       const data = await response.json();
-      if (data.messPhoto?.url) {
-        setMenuImage(data.messPhoto.url);
+      // console.log("Fetched Data:", data);
+
+      if (data.url) {
+        // console.log("Menu Image URL from API:", data.url);
+        setMenuImage(data.url);
+      } else {
+        console.warn("No menu image URL found in API response");
       }
     } catch (error) {
+      console.error("Error fetching menu image:", error);
       setError(
         error instanceof Error ? error.message : "Failed to fetch menu image"
       );
@@ -42,15 +52,20 @@ const MessPage = () => {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.warn("No file selected for upload");
+      return;
+    }
 
     if (!file.type.includes("image")) {
+      // console.error("Invalid file type:", file.type);
       setError("Please upload an image file");
       alert("Please upload an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
+      // console.error("File size too large:", file.size);
       setError("Image size should be less than 5MB");
       alert("Image size should be less than 5MB");
       return;
@@ -60,10 +75,10 @@ const MessPage = () => {
     setError(null);
     const formData = new FormData();
     formData.append("messPhoto", file);
-    // Add description if needed
     formData.append("description", "Mess Menu");
 
     try {
+      // console.log("Uploading file...");
       const response = await fetch(
         `${API_BASE_URL}/api/admin/upload-mess-menu`,
         {
@@ -75,21 +90,29 @@ const MessPage = () => {
         }
       );
 
+      // console.log("Upload Response Status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Error Response Data from Upload:", errorData);
         throw new Error(errorData.message || "Upload failed");
       }
 
       const data = await response.json();
-      if (data.messPhoto?.url) {
-        setMenuImage(data.messPhoto.url);
+      // console.log("Upload Response Data:", data);
+
+      if (data.url) {
+        console.log("New Menu Image URL:", data.url);
+        setMenuImage(data.url);
         alert("Menu uploaded successfully");
       } else {
+        console.error("Invalid response format from upload");
         throw new Error("Invalid response format");
       }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to upload menu image";
+      console.error("Error uploading image:", errorMessage);
       setError(errorMessage);
       alert(errorMessage);
     } finally {
@@ -197,8 +220,8 @@ const MessPage = () => {
                       </svg>
                     </div>
                   </div>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    No menu image uploaded yet
+                  <p className="text-gray-600 dark:text-gray-400">
+                    No menu image uploaded yet. Please upload a menu.
                   </p>
                 </div>
               </div>
