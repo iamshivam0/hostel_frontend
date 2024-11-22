@@ -101,9 +101,9 @@ const MessPage = () => {
       const data = await response.json();
       // console.log("Upload Response Data:", data);
 
-      if (data.url) {
+      if (data.messPhoto.url) {
         console.log("New Menu Image URL:", data.url);
-        setMenuImage(data.url);
+        setMenuImage(data.messPhoto.url);
         alert("Menu uploaded successfully");
       } else {
         console.error("Invalid response format from upload");
