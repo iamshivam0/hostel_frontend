@@ -28,8 +28,8 @@ export const sendResetPasswordEmail = async (email: string) => {
 
   // Email setup
   const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
+    host: "smtp.gmail.com",
+    port: 465,
     auth: {
       user: process.env.ETHEREAL_USER,
       pass: process.env.ETHEREAL_PASSWORD,
