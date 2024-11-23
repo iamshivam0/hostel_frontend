@@ -257,14 +257,14 @@ const AssignRoomPage = () => {
                   New Room Number
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value.trim())}
                   className="mt-1 w-full p-2.5 border rounded-lg bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter room number"
                   required
-                  pattern="[A-Za-z0-9-]+"
-                  title="Room number can only contain letters, numbers, and hyphens"
+                  min="1"
+                  title="Room number must be a positive number"
                 />
               </div>
 

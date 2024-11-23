@@ -32,6 +32,14 @@ const page = () => {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
+            <h2 className="text-3xl font-bold mb-2">Room Management </h2>
+            <p className="text-blue-100">
+              Manage Room assignments and occupants
+            </p>
+          </div>
+        </div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Quick Actions
         </h3>
