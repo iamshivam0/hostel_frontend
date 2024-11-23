@@ -25,7 +25,9 @@ import {
 } from "../controllers/Complaints.controller.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { deleteMessPhoto, getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
-import { requestPasswordReset, resetPassword } from "../controllers/student.controller.js";
+import { AssignOrUpdateRoom,  getAllRoommates } from "../controllers/RoomManagment.controller.js";
+
+
 
 const router = express.Router();
 
@@ -69,5 +71,14 @@ router.get("/getallleaves", getleaves);
 router.post("/upload-mess-menu", messUpload.single("messPhoto"),uploadMessPhoto);
 router.get("/mess-menu",getMessPhoto);
 router.delete("/delete-menu", deleteMessPhoto);
+
+
+//room managment routes 
+
+router.get("/get-All-Roomamtes",getAllRoommates);
+router.post("/assign-room", AssignOrUpdateRoom);
+router.post("/update-room", AssignOrUpdateRoom);
+
+
 
 export default router;
