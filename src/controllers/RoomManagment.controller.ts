@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 export const getAllRoommates = async (req: Request, res: Response) => {
   try {
     // Ensure the user is an admin
-    const isAdmin = req.user?.role === "admin" ||req.user?.role === "staff" ;
+    const isAdmin = req.user?.role === "admin" ;
     if (!isAdmin) {
       return res.status(403).json({ message: "Forbidden: Admins only" });
     }
@@ -41,7 +41,7 @@ import mongoose from "mongoose";
 export const AssignOrUpdateRoom = async (req: Request, res: Response) => {
   try {
     // Ensure the user is an admin
-    const isAdmin = req.user?.role === "admin" ||req.user?.role === "staff" ;
+    const isAdmin = req.user?.role === "admin" ;
     if (!isAdmin) {
       return res.status(403).json({ message: "Forbidden: Admins only" });
     }

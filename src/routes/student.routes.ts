@@ -13,8 +13,6 @@ import {
   changeStudentPassword,
   getStudentRoomates,
   uploadProfilePicture,
-  requestPasswordReset,
-  resetPassword,
 } from "../controllers/student.controller.js";
 import {
   createComplaint,

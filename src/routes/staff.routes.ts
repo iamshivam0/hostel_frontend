@@ -16,8 +16,7 @@ import { getComplaints } from "../controllers/Complaints.controller.js";
 import { validateLeaveReview } from "../middleware/leave.middleware.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
-import { requestPasswordReset, resetPassword } from "../controllers/student.controller.js";
-import { AssignOrUpdateRoom, getAllRoommates } from "../controllers/RoomManagment.controller.js";
+
 const router = express.Router();
 
 const messUpload = configureMulter("mess_photos");
@@ -102,10 +101,10 @@ router.get("/mess-menu", authenticateToken as any,
 
 // room controls
 
-router.get("/get-All-Roomamtes", authenticateToken as any,
-  authorizeRoles(["staff"]), getAllRoommates);
-router.post("/assign-room", authenticateToken as any,
-  authorizeRoles(["staff"]), AssignOrUpdateRoom);
-router.post("/update-room", authenticateToken as any,
-  authorizeRoles(["staff"]), AssignOrUpdateRoom);
+// router.get("/get-All-Roomamtes", authenticateToken as any,
+//   authorizeRoles(["staff"]), getAllRoommates);
+// router.post("/assign-room", authenticateToken as any,
+//   authorizeRoles(["staff"]), AssignOrUpdateRoom);
+// router.post("/update-room", authenticateToken as any,
+//   authorizeRoles(["staff"]), AssignOrUpdateRoom);
 export default router;

@@ -3,11 +3,7 @@ import Leave from "../models/leave.model.js";
 import User from "../models/user.model.js";
 import cloudinary from "../config/Cloudinary.js";
 import { updateProfilePic } from "../services/User.service.js";
-import {
-  generateResetToken,
-  sendResetPasswordEmail,
-  resetUserPassword,
-} from "../services/ForgetPassword.service.js"
+
 // Get student profile
 export const getStudentProfile = async (req: Request, res: Response) => {
   try {
@@ -336,26 +332,5 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error uploading profile picture:", error);
     res.status(500).json({ error: "Internal server error" });
-  }
-};
-export const requestPasswordReset = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    const { resetToken, user } = await generateResetToken(email);
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
-    await sendResetPasswordEmail(user.email);
-    res.status(200).json({ message: "Password reset email sent" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-export const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const { token, newPassword } = req.body;
-    await resetUserPassword(token, newPassword);
-    res.status(200).json({ message: "Password reset successful" });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
   }
 };
