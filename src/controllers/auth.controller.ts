@@ -17,8 +17,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log("Stored hashed password:", user.password); // Log the stored password hash
-    console.log("Entered password:", password); // Log the entered password
+    // console.log("Stored hashed password:", user.password); // Log the stored password hash
+    // console.log("Entered password:", password); // Log the entered password
 
     // Check password (using the model's comparePassword method)
     const isMatch = await user.comparePassword(password);
