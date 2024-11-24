@@ -5,7 +5,7 @@ import {
   generateResetToken,
   sendResetPasswordEmail,
   resetUserPassword,
-} from "../services/ForgetPassword.service.js"
+} from "../services/ForgetPassword.service.js";
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -17,8 +17,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    console.log('Stored hashed password:', user.password); // Log the stored password hash
-    console.log('Entered password:', password); // Log the entered password
+    console.log("Stored hashed password:", user.password); // Log the stored password hash
+    console.log("Entered password:", password); // Log the entered password
 
     // Check password (using the model's comparePassword method)
     const isMatch = await user.comparePassword(password);
@@ -39,6 +39,7 @@ export const login = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      ...(user.roomNumber && { roomNumber: user.roomNumber }),
     };
 
     res.json({
@@ -50,7 +51,6 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Login failed" });
   }
 };
-
 
 export const register = async (req: Request, res: Response) => {
   try {
