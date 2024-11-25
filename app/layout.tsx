@@ -1,6 +1,7 @@
 import { ThemeProvider } from "./providers/theme-provider";
 import "./globals.css";
 
+
 export default function RootLayout({
   children,
 }: {

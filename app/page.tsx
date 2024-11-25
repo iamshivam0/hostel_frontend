@@ -3,9 +3,71 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "./providers/theme-provider";
+import { useEffect } from "react";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+// import { app } from '../firebase_app';
+
+import { initializeApp } from 'firebase/app';
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCaN_a5mqyexlHmf6emRuwR-C2PgNSlWcg",
+  authDomain: "first-project-b7e96.firebaseapp.com",
+  projectId: "first-project-b7e96",
+  storageBucket: "first-project-b7e96.firebasestorage.app",
+  messagingSenderId: "842145969374",
+  appId: "1:842145969374:web:780d33c996f32893d03e4f",
+  measurementId: "G-K0WR5RC353"
+};
+
 
 export default function Home() {
+  const app = initializeApp(firebaseConfig)
+
+  const messaging = getMessaging(app);
   const { theme, toggleTheme } = useTheme();
+
+  onMessage(messaging, (payload) => {
+    console.log('Message received. ', payload);
+    // ...
+  });
+
+  function requestPermission() {
+    console.log('Requesting permission...');
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        console.log('Notification permission granted.');
+
+        generateToken();
+      }
+    })
+  }
+
+  const generateToken = () => {
+    getToken(messaging, { vapidKey: 'BK9xzw4Kk1oYel64N1WjpJRE5KxcnfMz2Y2sRQu0dytm0GueGRe2W2u-P5-zFfMaC-3lSi4Zm-yQpGz1JR3rqkI' }).then((currentToken) => {
+      if (currentToken) {
+        // Send the token to your server and update the UI if necessary
+        // ...
+        saveTokenInDB(currentToken);
+      } else {
+        // Show permission request UI
+        console.log('No registration token available. Request permission to generate one.');
+        // ...
+      }
+    }).catch((err) => {
+      console.log('An error occurred while retrieving token. ', err);
+      // ...
+    });
+  }
+
+  const saveTokenInDB = (token: string) => {
+    // db save
+    console.log(token)
+  }
+
+  useEffect(() => {
+    requestPermission();
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
