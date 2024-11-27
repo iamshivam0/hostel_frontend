@@ -93,7 +93,7 @@ export default function ComplaintsPage() {
   };
 
   const getFilteredComplaints = () => {
-    let filtered = [...complaints];
+    let filtered = [...complaints].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     if (sortBy !== "all") {
       filtered = filtered.filter((complaint) => complaint.type === sortBy);

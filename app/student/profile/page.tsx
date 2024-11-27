@@ -14,7 +14,17 @@ export default function StudentProfile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [formData, setFormData] = useState({
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [formData, setFormData] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    roomNumber: string;
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+    profileImage: string | File;
+  }>({
     firstName: "",
     lastName: "",
     email: "",
@@ -22,6 +32,7 @@ export default function StudentProfile() {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+    profileImage: "",
   });
 
   useEffect(() => {
@@ -35,7 +46,11 @@ export default function StudentProfile() {
       lastName: user.lastName,
       email: user.email,
       roomNumber: user.roomNumber || "",
+      profileImage: user.profileImage || "",
     }));
+    if (user.profileImage) {
+      setImagePreview(user.profileImage);
+    }
   }, [user, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +58,27 @@ export default function StudentProfile() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    // Clear messages when user starts typing
     setError("");
     setSuccess("");
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a preview for the image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+      };
+      reader.readAsDataURL(file);
+
+      // Store the file in formData
+      setFormData((prev) => ({
+        ...prev,
+        profileImage: file,
+      }));
+    }
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -55,8 +88,57 @@ export default function StudentProfile() {
     setSuccess("");
 
     try {
+      const formDataToSend = new FormData();
+      if (formData.profileImage instanceof File) {
+        formDataToSend.append("profilePic", formData.profileImage);
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/student/upload-profile-pic`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: formDataToSend,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile picture");
+      }
+
+      const result = await response.json();
+
+      // Update the user object with the new profile picture URL
+      const updatedUser = {
+        ...user!,
+        profileImage: result.profilePicUrl,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      setSuccess("Profile picture updated successfully!");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile picture"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfileInfoUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
       const response = await fetch(`${API_BASE_URL}/api/student/profile`, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -70,16 +152,18 @@ export default function StudentProfile() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update profile");
+        throw new Error("Failed to update profile information");
       }
 
       const updatedUser = await response.json();
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
-      setSuccess("Profile updated successfully!");
+      setSuccess("Profile information updated successfully!");
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Failed to update profile"
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile information"
       );
     } finally {
       setLoading(false);
@@ -204,7 +288,59 @@ export default function StudentProfile() {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Profile Information
               </h2>
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
+              <form className="space-y-6">
+                {/* Profile Image */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <svg
+                          className="w-12 h-12 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-center gap-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                      id="profile-image-input"
+                    />
+                    <label
+                      htmlFor="profile-image-input"
+                      className="cursor-pointer px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors duration-200"
+                    >
+                      Change Profile Picture
+                    </label>
+                    <button
+                      onClick={handleProfileUpdate}
+                      disabled={
+                        loading || !(formData.profileImage instanceof File)
+                      }
+                      className="px-6 py-2 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Upload New Picture
+                    </button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -258,11 +394,11 @@ export default function StudentProfile() {
                 </div>
                 <div className="flex justify-end">
                   <button
-                    type="submit"
+                    onClick={handleProfileInfoUpdate}
                     disabled={loading}
-                    className="px-6 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                    className="px-6 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50"
                   >
-                    Update Profile
+                    Update Profile Information
                   </button>
                 </div>
               </form>

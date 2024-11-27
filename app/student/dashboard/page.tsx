@@ -130,19 +130,32 @@ export default function StudentDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
-            <h2
-              className="text-3xl font-bold mb-2"
-              aria-label={`Welcome back, ${user.firstName}`}
-            >
-              Welcome back, {user.firstName} 👋
-            </h2>
-            <p className="text-blue-100">
-              Room Number: <strong>{user.roomNumber}</strong>
-            </p>
+            <div className="flex items-center gap-6">
+              {/* Profile Image */}
+              <div className="flex-shrink-0">
+                <img
+                  src={user.profileImage || "/default-avatar.png"} // Fallback to default avatar
+                  alt={`${user.firstName}'s profile`}
+                  className="w-20 h-20 rounded-full border-4 border-white/20 object-cover"
+                />
+              </div>
 
-            <p className="text-blue-100">
-              Access all your hostel services from your personal dashboard.
-            </p>
+              {/* Welcome Text */}
+              <div>
+                <h2
+                  className="text-3xl font-bold mb-2"
+                  aria-label={`Welcome back, ${user.firstName}`}
+                >
+                  Welcome back, {user.firstName} 👋
+                </h2>
+                <p className="text-blue-100">
+                  Room Number: <strong>{user.roomNumber}</strong>
+                </p>
+                <p className="text-blue-100">
+                  Access all your hostel services from your personal dashboard.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

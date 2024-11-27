@@ -1,8 +1,11 @@
 export interface User {
   _id: string;
-  email: string;
   firstName: string;
   lastName: string;
-  role: "admin" | "student" | "staff" | "parent";
+  email: string;
+  role: string;
   roomNumber?: string;
+  profileImage?: string;
+  createdAt: string;
+  updatedAt: string;
 }
