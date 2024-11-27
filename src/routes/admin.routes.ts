@@ -25,7 +25,8 @@ import {
 } from "../controllers/Complaints.controller.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { deleteMessPhoto, getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
-import { AssignOrUpdateRoom,  getAllRoommates } from "../controllers/RoomManagment.controller.js";
+import { AssignOrUpdateRoom, getAllRoommates } from "../controllers/RoomManagment.controller.js";
+import { createAnnouncement, deleteAnnouncement, getAllAnnouncements, updateAnnouncement } from "../controllers/Announcment.controller.js";
 
 
 
@@ -68,17 +69,26 @@ router.get("/getallleaves", getleaves);
 
 //Mess-upload 
 
-router.post("/upload-mess-menu", messUpload.single("messPhoto"),uploadMessPhoto);
-router.get("/mess-menu",getMessPhoto);
+router.post("/upload-mess-menu", messUpload.single("messPhoto"), uploadMessPhoto);
+router.get("/mess-menu", getMessPhoto);
 router.delete("/delete-menu", deleteMessPhoto);
 
 
 //room managment routes 
 
-router.get("/get-All-Roomamtes",getAllRoommates);
+router.get("/get-All-Roomamtes", getAllRoommates);
 router.post("/assign-room", AssignOrUpdateRoom);
 router.post("/update-room", AssignOrUpdateRoom);
 
+
+//routes for announcments 
+
+router.get("/getadminannouncment", getAllAnnouncements);
+router.post("/createadminannouncment", createAnnouncement);
+router.put('/update-announcment/:type/:id', updateAnnouncement);
+
+// Delete an announcement (type: student/general)
+router.delete('/delete-announcment/:type/:id', deleteAnnouncement);
 
 
 export default router;

@@ -16,6 +16,7 @@ import { getComplaints } from "../controllers/Complaints.controller.js";
 import { validateLeaveReview } from "../middleware/leave.middleware.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
 import { getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
+import { getGeneralAnnouncements, postGeneralAnnouncement } from "../controllers/Announcment.controller.js";
 
 const router = express.Router();
 
@@ -107,4 +108,14 @@ router.get("/mess-menu", authenticateToken as any,
 //   authorizeRoles(["staff"]), AssignOrUpdateRoom);
 // router.post("/update-room", authenticateToken as any,
 //   authorizeRoles(["staff"]), AssignOrUpdateRoom);
+
+//Aanouncments controls 
+router.get("/getstaffAnnouncments",
+  authenticateToken as any,
+  authorizeRoles(["staff"]),
+  getGeneralAnnouncements);
+router.post("/create-staffAanouncments",
+  authenticateToken as any,
+  authorizeRoles(["staff"]),
+  postGeneralAnnouncement)
 export default router;
