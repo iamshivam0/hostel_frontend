@@ -4,6 +4,7 @@ interface User {
   role: "admin" | "staff" | "student" | "parent";
   firstName: string;
   lastName: string;
+  profilePicUrl?: string,
 }
 
 export const getUser = (): User | null => {

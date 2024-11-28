@@ -23,7 +23,7 @@ export default function StudentProfile() {
     currentPassword: string;
     newPassword: string;
     confirmPassword: string;
-    profileImage: string | File;
+    profilePicUrl: string | File;
   }>({
     firstName: "",
     lastName: "",
@@ -32,9 +32,18 @@ export default function StudentProfile() {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    profileImage: "",
+    profilePicUrl: "",
   });
+  // const [profile, setProfile] = useState<string | null>(null);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      const profilePicUrl = user.profileImage || "";
+      setImagePreview(profilePicUrl); // Use the stored URL to display the image
+    }
+  }, []);
   useEffect(() => {
     if (!user || !hasRole(["student"])) {
       router.push("/login");
@@ -46,11 +55,10 @@ export default function StudentProfile() {
       lastName: user.lastName,
       email: user.email,
       roomNumber: user.roomNumber || "",
-      profileImage: user.profileImage || "",
+      profilePicUrl: user.profileImage || ""
     }));
-    if (user.profileImage) {
-      setImagePreview(user.profileImage);
-    }
+    // console.log(user);
+    // setImagePreview(user.profileImage)
   }, [user, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +84,7 @@ export default function StudentProfile() {
       // Store the file in formData
       setFormData((prev) => ({
         ...prev,
-        profileImage: file,
+        profilePicUrl: file,
       }));
     }
   };
@@ -89,8 +97,8 @@ export default function StudentProfile() {
 
     try {
       const formDataToSend = new FormData();
-      if (formData.profileImage instanceof File) {
-        formDataToSend.append("profilePic", formData.profileImage);
+      if (formData.profilePicUrl instanceof File) {
+        formDataToSend.append("profilePic", formData.profilePicUrl);
       }
 
       const response = await fetch(
@@ -113,11 +121,12 @@ export default function StudentProfile() {
       // Update the user object with the new profile picture URL
       const updatedUser = {
         ...user!,
-        profileImage: result.profilePicUrl,
+        profilePicUrl: result.profilePicUrl,
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
+      setImagePreview(result.profilePicUrl);
       setSuccess("Profile picture updated successfully!");
     } catch (error) {
       setError(
@@ -138,7 +147,7 @@ export default function StudentProfile() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/student/profile`, {
-        method: "PATCH",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -148,6 +157,7 @@ export default function StudentProfile() {
           lastName: formData.lastName,
           email: formData.email,
           roomNumber: formData.roomNumber,
+          // profilePicUrl: formData.profilePicUrl
         }),
       });
 
@@ -295,7 +305,7 @@ export default function StudentProfile() {
                     {imagePreview ? (
                       <img
                         src={imagePreview}
-                        alt="Profile"
+                        alt="Profile Preview"
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -333,7 +343,7 @@ export default function StudentProfile() {
                     <button
                       onClick={handleProfileUpdate}
                       disabled={
-                        loading || !(formData.profileImage instanceof File)
+                        loading || !(formData.profilePicUrl instanceof File)
                       }
                       className="px-6 py-2 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >

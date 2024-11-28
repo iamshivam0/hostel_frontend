@@ -26,7 +26,20 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [menuImage, setMenuImage] = useState<string | null>(null);
+  const [profile, setProfile] = useState<string | null>(null);
+  // Declare formData and setFormData
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    roomNumber: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    profilePicUrl: "", // Make sure this is correctly initialized
+  });
 
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   useEffect(() => {
     if (!user || !hasRole(["student"])) {
       router.push("/login");
@@ -77,11 +90,70 @@ export default function StudentDashboard() {
     }
   };
 
+
   useEffect(() => {
     if (isMenuModalOpen) {
       fetchMenuImage();
     }
   }, [isMenuModalOpen]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/student/profile`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile data");
+      }
+
+      const profileData = await response.json();
+      // console.log(profileData);
+
+      // Set profilePicUrl to both profile state and the user state
+      setProfile(profileData.profilePicUrl);
+      setUser((prevUser) => ({
+        ...prevUser!, // Spread the previous user object
+        profileImage: profileData.profilePicUrl, // Update only the profileImage field
+      }));
+
+      // Optionally, store the updated user object in localStorage
+      localStorage.setItem("user", JSON.stringify({
+        ...user,
+        profileImage: profileData.profilePicUrl, // Save the updated profile image URL
+      }));
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        console.log("Profile picture URL:", userData.profileImage);
+      } else {
+        console.log("User is not found in localStorage.");
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        email: profileData.email,
+        roomNumber: profileData.roomNumber || "",
+        profilePicUrl: profileData.profilePicUrl || "",
+      }));
+      // console.log(profileData.profilePicUrl);
+
+      // Update the preview
+      setImagePreview(profileData.profilePicUrl || "");
+    } catch (error) {
+      console.error(
+        error instanceof Error ? error.message : "Failed to fetch user profile"
+      );
+    }
+  };
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   if (!user) return null;
 
@@ -134,7 +206,7 @@ export default function StudentDashboard() {
               {/* Profile Image */}
               <div className="flex-shrink-0">
                 <img
-                  src={user.profileImage || "/default-avatar.png"} // Fallback to default avatar
+                  src={imagePreview || "/default-avatar.png"} // Fallback to default avatar
                   alt={`${user.firstName}'s profile`}
                   className="w-20 h-20 rounded-full border-4 border-white/20 object-cover"
                 />
