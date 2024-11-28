@@ -147,7 +147,7 @@ export default function StudentProfile() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/student/profile`, {
-        method: "GET",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
