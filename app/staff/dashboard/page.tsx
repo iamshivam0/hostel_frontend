@@ -7,6 +7,7 @@ import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
 import MenuModal from "@/app/components/MenuModal";
+import AnnouncementModal from "@/app/components/AnnouncementModal";
 
 interface LeaveStats {
   pending: number;
@@ -25,7 +26,10 @@ export default function StaffDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
   const [menuImage, setMenuImage] = useState<string | null>(null);
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     if (!user || !hasRole(["staff"])) {
@@ -104,6 +108,12 @@ export default function StaffDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsAnnouncementModalOpen(true)}
+                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                📢 Announcements
+              </button>
               <button
                 onClick={() => setIsMenuModalOpen(true)}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -409,6 +419,10 @@ export default function StaffDashboard() {
         isOpen={isMenuModalOpen}
         onClose={() => setIsMenuModalOpen(false)}
         menuUrl={menuImage}
+      />
+      <AnnouncementModal
+        isOpen={isAnnouncementModalOpen}
+        onClose={() => setIsAnnouncementModalOpen(false)}
       />
     </div>
   );

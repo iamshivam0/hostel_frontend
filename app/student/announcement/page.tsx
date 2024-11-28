@@ -7,61 +7,39 @@ import { toast } from "react-hot-toast";
 import { API_BASE_URL } from "@/app/config/api";
 
 interface AnnouncementFormData {
-  type: "student" | "general";
   title: string;
   content: string;
-  targetAudience?: "students" | "staff" | "all";
 }
 
-export default function CreateAnnouncement() {
+export default function CreateStudentAnnouncement() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm<AnnouncementFormData>({
-    defaultValues: {
-      type: "general",
-      targetAudience: "all",
-    },
-  });
-
-  const announcementType = watch("type");
+  } = useForm<AnnouncementFormData>();
 
   const onSubmit = async (data: AnnouncementFormData) => {
     setIsSubmitting(true);
     try {
       const user = localStorage.getItem("user");
       const userData = user ? JSON.parse(user) : null;
+      console.log(user);
 
       if (!userData) {
         throw new Error("User not found");
       }
 
-      const name = `${userData.firstName} ${userData.lastName}`;
-
-      // If type is student, remove targetAudience from payload
-      const payload =
-        data.type === "student"
-          ? {
-              type: data.type,
-              title: data.title,
-              content: data.content,
-              name,
-            }
-          : {
-              type: data.type,
-              title: data.title,
-              content: data.content,
-              name,
-              targetAudience: data.targetAudience,
-            };
+      const payload = {
+        title: data.title,
+        content: data.content,
+        userId: userData.id,
+      };
 
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/createadminannouncment`,
+        `${API_BASE_URL}/api/student/create-announcement`,
         {
           method: "POST",
           headers: {
@@ -78,7 +56,7 @@ export default function CreateAnnouncement() {
       }
 
       toast.success("Announcement created successfully");
-      router.push("/admin/announcement");
+      router.push("/student/dashboard");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create announcement"
@@ -102,7 +80,7 @@ export default function CreateAnnouncement() {
                 |
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                Create Announcement
+                Create Student Announcement
               </span>
             </div>
             <button
@@ -118,28 +96,10 @@ export default function CreateAnnouncement() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Create New Announcement
+            Create Student Announcement
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Announcement Type
-              </label>
-              <select
-                {...register("type", { required: "Type is required" })}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
-              >
-                <option value="general">General Announcement</option>
-                <option value="student">Student Announcement</option>
-              </select>
-              {errors.type && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.type.message}
-                </p>
-              )}
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Title
@@ -173,30 +133,6 @@ export default function CreateAnnouncement() {
                 </p>
               )}
             </div>
-
-            {announcementType === "general" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Target Audience
-                </label>
-                <select
-                  {...register("targetAudience", {
-                    required:
-                      "Target audience is required for general announcements",
-                  })}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
-                >
-                  <option value="all">All</option>
-                  <option value="students">Students Only</option>
-                  <option value="staff">Staff Only</option>
-                </select>
-                {errors.targetAudience && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.targetAudience.message}
-                  </p>
-                )}
-              </div>
-            )}
 
             <div className="flex justify-end">
               <button

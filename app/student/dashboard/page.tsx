@@ -7,6 +7,7 @@ import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
 import MenuModal from "@/app/components/MenuModal";
+import AnnouncementModal from "@/app/components/studentAnnouncementModel";
 
 interface Leave {
   _id: string;
@@ -23,6 +24,8 @@ export default function StudentDashboard() {
     approved: 0,
     total: 0,
   });
+  const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [menuImage, setMenuImage] = useState<string | null>(null);
@@ -90,7 +93,6 @@ export default function StudentDashboard() {
     }
   };
 
-
   useEffect(() => {
     if (isMenuModalOpen) {
       fetchMenuImage();
@@ -121,10 +123,13 @@ export default function StudentDashboard() {
       }));
 
       // Optionally, store the updated user object in localStorage
-      localStorage.setItem("user", JSON.stringify({
-        ...user,
-        profileImage: profileData.profilePicUrl, // Save the updated profile image URL
-      }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          profileImage: profileData.profilePicUrl, // Save the updated profile image URL
+        })
+      );
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const userData = JSON.parse(storedUser);
@@ -175,6 +180,12 @@ export default function StudentDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsAnnouncementModalOpen(true)}
+                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                📢 Announcements
+              </button>
               <button
                 onClick={() => setIsMenuModalOpen(true)}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -468,6 +479,38 @@ export default function StudentDashboard() {
               View all your complaints
             </p>
           </button>
+          <button
+            onClick={() => router.push("/student/announcement")}
+            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+          >
+            <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
+              <svg
+                className="w-8 h-8 text-purple-600 dark:text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 14l2 2 4-4"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Create announcement
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              work in progress
+            </p>
+          </button>
           <button className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105">
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -504,6 +547,10 @@ export default function StudentDashboard() {
         isOpen={isMenuModalOpen}
         onClose={() => setIsMenuModalOpen(false)}
         menuUrl={menuImage}
+      />
+      <AnnouncementModal
+        isOpen={isAnnouncementModalOpen}
+        onClose={() => setIsAnnouncementModalOpen(false)}
       />
     </div>
   );
