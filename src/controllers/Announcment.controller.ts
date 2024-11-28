@@ -5,10 +5,27 @@ import User from '../models/user.model.js'; // Import User model for lookup
 
 export const getStudentAnnouncements = async (req: Request, res: Response) => {
     try {
-        const announcements = await StudentAnnouncement.find().sort({ createdAt: -1 });
-        res.status(200).json(announcements);
+        // Fetch student announcements
+        const studentAnnouncements = await StudentAnnouncement.find();
+
+        // Fetch general announcements for students
+        const generalAnnouncements = await GeneralAnnouncement.find({
+            targetAudience: { $in: ['students', 'all'] }
+        });
+
+        // Return both types separately
+        res.status(200).json({
+            studentAnnouncements,
+            generalAnnouncements,
+            // Include metadata that might be useful for frontend
+            metadata: {
+                totalStudentAnnouncements: studentAnnouncements.length,
+                totalGeneralAnnouncements: generalAnnouncements.length,
+                lastUpdated: new Date()
+            }
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching student announcements', error });
+        res.status(500).json({ message: 'Error fetching announcements', error });
     }
 };
 

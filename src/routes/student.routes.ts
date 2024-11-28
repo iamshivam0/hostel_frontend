@@ -22,7 +22,10 @@ import {
 } from "../controllers/Complaints.controller.js";
 import { configureMulter } from "../middleware/upload.middleware.js"; // Import the multer configuration
 import { getMessPhoto } from "../controllers/mess.controller.js";
-import { getStudentAnnouncements, postStudentAnnouncement } from "../controllers/Announcment.controller.js";
+import {
+  getStudentAnnouncements,
+  postStudentAnnouncement,
+} from "../controllers/Announcment.controller.js";
 
 // Configure multer for profile photos
 const profileUpload = configureMulter("profile_photos");
@@ -132,12 +135,16 @@ router.get(
 );
 
 //announcment controls
-router.get("/getAnnouncments",
+router.get(
+  "/getAnnouncments",
   authenticateToken,
   authorizeRoles(["student"]),
-  getStudentAnnouncements);
-router.post("/create-Aanouncments",
+  getStudentAnnouncements
+);
+router.post(
+  "/create-announcement",
   authenticateToken,
   authorizeRoles(["student"]),
-  postStudentAnnouncement)
+  postStudentAnnouncement
+);
 export default router;

@@ -15,8 +15,14 @@ import {
 import { getComplaints } from "../controllers/Complaints.controller.js";
 import { validateLeaveReview } from "../middleware/leave.middleware.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
-import { getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
-import { getGeneralAnnouncements, postGeneralAnnouncement } from "../controllers/Announcment.controller.js";
+import {
+  getMessPhoto,
+  uploadMessPhoto,
+} from "../controllers/mess.controller.js";
+import {
+  getGeneralAnnouncements,
+  postGeneralAnnouncement,
+} from "../controllers/Announcment.controller.js";
 
 const router = express.Router();
 
@@ -92,13 +98,19 @@ router.get(
 
 // mess-controls
 
-router.post("/upload-mess-menu", authenticateToken as any,
+router.post(
+  "/upload-mess-menu",
+  authenticateToken as any,
   authorizeRoles(["staff"]),
   messUpload.single("messPhoto"),
-  uploadMessPhoto);
-router.get("/mess-menu", authenticateToken as any,
+  uploadMessPhoto
+);
+router.get(
+  "/mess-menu",
+  authenticateToken as any,
   authorizeRoles(["staff"]),
-  getMessPhoto);
+  getMessPhoto
+);
 
 // room controls
 
@@ -109,13 +121,17 @@ router.get("/mess-menu", authenticateToken as any,
 // router.post("/update-room", authenticateToken as any,
 //   authorizeRoles(["staff"]), AssignOrUpdateRoom);
 
-//Aanouncments controls 
-router.get("/getstaffAnnouncments",
+//Aanouncments controls
+router.get(
+  "/getstaffAnnouncments",
   authenticateToken as any,
   authorizeRoles(["staff"]),
-  getGeneralAnnouncements);
-router.post("/create-staffAanouncments",
+  getGeneralAnnouncements
+);
+router.post(
+  "/create-staffAanouncments",
   authenticateToken as any,
   authorizeRoles(["staff"]),
-  postGeneralAnnouncement)
+  postGeneralAnnouncement
+);
 export default router;
