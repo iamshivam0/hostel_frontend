@@ -14,7 +14,7 @@ interface GeneralAnnouncement {
   title: string;
   content: string;
   staffName: string;
-  targetAudience: 'students' | 'staff' | 'all';
+  targetAudience: "students" | "staff" | "all";
   createdAt: string;
 }
 
@@ -33,12 +33,19 @@ interface AnnouncementModalProps {
   onClose: () => void;
 }
 
-type AnnouncementType = 'student' | 'general' | 'all';
+type AnnouncementType = "student" | "general" | "all";
 
-const StudentAnnouncementModal = ({ isOpen, onClose }: AnnouncementModalProps) => {
-  const [studentAnnouncements, setStudentAnnouncements] = useState<StudentAnnouncement[]>([]);
-  const [generalAnnouncements, setGeneralAnnouncements] = useState<GeneralAnnouncement[]>([]);
-  const [selectedType, setSelectedType] = useState<AnnouncementType>('all');
+const StudentAnnouncementModal = ({
+  isOpen,
+  onClose,
+}: AnnouncementModalProps) => {
+  const [studentAnnouncements, setStudentAnnouncements] = useState<
+    StudentAnnouncement[]
+  >([]);
+  const [generalAnnouncements, setGeneralAnnouncements] = useState<
+    GeneralAnnouncement[]
+  >([]);
+  const [selectedType, setSelectedType] = useState<AnnouncementType>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,27 +85,30 @@ const StudentAnnouncementModal = ({ isOpen, onClose }: AnnouncementModalProps) =
 
   const getFilteredAnnouncements = () => {
     switch (selectedType) {
-      case 'student':
-        return studentAnnouncements.map(ann => ({
+      case "student":
+        return studentAnnouncements.map((ann) => ({
           ...ann,
-          isStudent: true
+          isStudent: true,
         }));
-      case 'general':
-        return generalAnnouncements.map(ann => ({
+      case "general":
+        return generalAnnouncements.map((ann) => ({
           ...ann,
-          isStudent: false
+          isStudent: false,
         }));
-      case 'all':
+      case "all":
         return [
-          ...studentAnnouncements.map(ann => ({
+          ...studentAnnouncements.map((ann) => ({
             ...ann,
-            isStudent: true
+            isStudent: true,
           })),
-          ...generalAnnouncements.map(ann => ({
+          ...generalAnnouncements.map((ann) => ({
             ...ann,
-            isStudent: false
-          }))
-        ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            isStudent: false,
+          })),
+        ].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
     }
   };
 
@@ -139,14 +149,15 @@ const StudentAnnouncementModal = ({ isOpen, onClose }: AnnouncementModalProps) =
 
         {/* Filter Tabs */}
         <div className="flex space-x-2 p-4 border-b border-gray-200 dark:border-gray-700/50">
-          {(['all', 'student', 'general'] as const).map((type) => (
+          {(["all", "student", "general"] as const).map((type) => (
             <button
               key={type}
               onClick={() => setSelectedType(type)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 
-                ${selectedType === type 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ${
+                  selectedType === type
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                 }`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -216,12 +227,14 @@ const StudentAnnouncementModal = ({ isOpen, onClose }: AnnouncementModalProps) =
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                           {announcement.title}
                         </h4>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          announcement.isStudent 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-300'
-                        }`}>
-                          {announcement.isStudent ? 'Student' : 'General'}
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            announcement.isStudent
+                              ? "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300"
+                              : "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-300"
+                          }`}
+                        >
+                          {announcement.isStudent ? "Student" : "General"}
                         </span>
                       </div>
                       <p className="text-gray-600 dark:text-gray-300 mb-3 whitespace-pre-wrap">
@@ -245,8 +258,8 @@ const StudentAnnouncementModal = ({ isOpen, onClose }: AnnouncementModalProps) =
                         />
                       </svg>
                       <span>
-                        {announcement.isStudent 
-                          ? (announcement as StudentAnnouncement).studentName 
+                        {announcement.isStudent
+                          ? (announcement as StudentAnnouncement).studentName
                           : (announcement as GeneralAnnouncement).staffName}
                       </span>
                     </div>
