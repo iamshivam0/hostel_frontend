@@ -47,7 +47,7 @@ const router = express.Router();
 const messUpload = configureMulter("mess_photos");
 
 const upload = multer({
-  // dest: "uploads/", // Temporary folder for uploaded files
+  dest: "uploads/", // Temporary folder for uploaded files
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = ["text/csv", "application/vnd.ms-excel"];
     if (!allowedMimeTypes.includes(file.mimetype)) {
