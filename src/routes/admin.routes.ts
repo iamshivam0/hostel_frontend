@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   authenticateToken,
   authorizeRoles,
@@ -24,16 +25,37 @@ import {
   getComplaints,
 } from "../controllers/Complaints.controller.js";
 import { configureMulter } from "../middleware/upload.middleware.js";
-import { deleteMessPhoto, getMessPhoto, uploadMessPhoto } from "../controllers/mess.controller.js";
-import { AssignOrUpdateRoom, getAllRoommates } from "../controllers/RoomManagment.controller.js";
-import { createAnnouncement, deleteAnnouncement, getAllAnnouncements, updateAnnouncement } from "../controllers/Announcment.controller.js";
-
-
+import {
+  deleteMessPhoto,
+  getMessPhoto,
+  uploadMessPhoto,
+} from "../controllers/mess.controller.js";
+import {
+  AssignOrUpdateRoom,
+  getAllRoommates,
+} from "../controllers/RoomManagment.controller.js";
+import {
+  createAnnouncement,
+  deleteAnnouncement,
+  getAllAnnouncements,
+  updateAnnouncement,
+} from "../controllers/Announcment.controller.js";
+import { importOrUpdateUsersFromCSV } from "../controllers/CSV.controller.js";
 
 const router = express.Router();
 
 const messUpload = configureMulter("mess_photos");
 
+const upload = multer({
+  // dest: "uploads/", // Temporary folder for uploaded files
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ["text/csv", "application/vnd.ms-excel"];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      return cb(new Error("Only CSV files are allowed")); // Reject the file
+    }
+    cb(null, true); // Accept the file
+  },
+});
 
 // Protect all admin routes
 router.use(authenticateToken, authorizeRoles(["admin"]));
@@ -67,28 +89,34 @@ router.delete("/delete-staff/:id", deleteStaff);
 
 router.get("/getallleaves", getleaves);
 
-//Mess-upload 
+//Mess-upload
 
-router.post("/upload-mess-menu", messUpload.single("messPhoto"), uploadMessPhoto);
+router.post(
+  "/upload-mess-menu",
+  messUpload.single("messPhoto"),
+  uploadMessPhoto
+);
 router.get("/mess-menu", getMessPhoto);
 router.delete("/delete-menu", deleteMessPhoto);
 
-
-//room managment routes 
+//room managment routes
 
 router.get("/get-All-Roomamtes", getAllRoommates);
 router.post("/assign-room", AssignOrUpdateRoom);
 router.post("/update-room", AssignOrUpdateRoom);
 
-
-//routes for announcments 
+//routes for announcments
 
 router.get("/getadminannouncment", getAllAnnouncements);
 router.post("/createadminannouncment", createAnnouncement);
-router.put('/update-announcment/:type/:id', updateAnnouncement);
+router.put("/update-announcment/:type/:id", updateAnnouncement);
 
 // Delete an announcement (type: student/general)
-router.delete('/delete-announcment/:type/:id', deleteAnnouncement);
+router.delete("/delete-announcment/:type/:id", deleteAnnouncement);
 
+// CSV import Routes
+
+// Route to handle CSV upload and import
+router.post("/import-csv", upload.single("file"), importOrUpdateUsersFromCSV);
 
 export default router;
