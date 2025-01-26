@@ -101,7 +101,7 @@ export default function ManageStaff() {
             </p>
           </button>
 
-          <button
+          {/* <button
             onClick={() => router.push("/admin/manage-staff/departments")}
             className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
@@ -126,7 +126,7 @@ export default function ManageStaff() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Organize staff departments
             </p>
-          </button>
+          </button> */}
 
           <button
             onClick={() => router.push("/admin/manage-staff/view-staff")}
