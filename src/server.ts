@@ -21,7 +21,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://hostel-backend-new.onrender.com"
+      "https://hostel-backend-new.onrender.com",
+      "https://hostel-frontend-fx5j.vercel.app/",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
