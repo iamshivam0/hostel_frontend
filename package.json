@@ -12,6 +12,7 @@
     "create-admin": "node --loader ts-node/esm src/scripts/createAdmin.ts"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
@@ -22,6 +23,7 @@
     "mongoose": "^7.0.3",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16"
   },
   "devDependencies": {
@@ -31,6 +33,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/multer": "^1.4.12",
     "@types/node": "^18.15.11",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
