@@ -11,6 +11,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "lucide-react": "^0.456.0",
     "next": "15.1.6",
     "react": "19.0.0",
@@ -21,6 +22,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
