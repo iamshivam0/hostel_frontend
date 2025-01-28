@@ -9,9 +9,12 @@ import CryptoJS from "crypto-js";
 import {ENCRYPTION_KEY} from "../config/api";
 
 const key = ENCRYPTION_KEY;
-
-export const encryptPassword = (password: string): string => {
-  return CryptoJS.AES.encrypt(password, key||"").toString();
+const config: { [key: string]: any } = {};
+config.encryptPassword = (password: string) => {
+  if (!key) {
+    throw new Error("Encryption key is not defined.");
+  }
+  return CryptoJS.AES.encrypt(password, key).toString();
 };
 
 
@@ -29,7 +32,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const Password = encryptPassword(password);   
+      const Password = config.encryptPassword(password);   
       // console.log("Hashed Password:", key);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
