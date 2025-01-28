@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://hostel-backend-new.onrender.com";
 
 // Use environment variables for sensitive data like encryption keys
 export const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "thisisthekey";
