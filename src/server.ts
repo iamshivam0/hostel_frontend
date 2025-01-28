@@ -11,8 +11,6 @@ import studentRoutes from "./routes/student.routes.js";
 import staffRoutes from "./routes/staff.routes.js";
 import passwordroutes from "./routes/passwordreset.routes.js";
 // import complaintRoutes from "./routes/Complaint.routes.js";
-import axios from "axios";
-import cron from "node-cron";
 import "./config/Cloudinary.js";
 dotenv.config();
 
@@ -32,29 +30,8 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
-
-cron.schedule("*/15 * * * *", async () => {
-  // if (!BACKEND_URL) {
-  //   console.warn("Health check URL not configured, skipping health check");
-  //   return;
-  // }
-
-  try {
-    const response = await axios.get("https://hostel-backend-new.onrender.com");
-    console.log(`Health check successful - Status: ${response.status}`);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    console.error(`Health check failed: ${errorMessage}`);
-  }
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.send("Welcome to Hostel Management System API");
-});
 
 // Routes
 app.use("/api/auth", authRoutes);

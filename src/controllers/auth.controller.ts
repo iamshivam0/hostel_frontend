@@ -1,26 +1,37 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import crypto from 'crypto';
 import User from "../models/user.model.js";
 import {
   generateResetToken,
   sendResetPasswordEmail,
   resetUserPassword,
 } from "../services/ForgetPassword.service.js";
+import CryptoJS from "crypto-js";
+import dotenv from "dotenv";
 
+dotenv.config();
+const key =process.env.ENCRYPTION_KEY||""; 
+const decryptPassword = (encryptedPassword: string): string => {
+
+  const bytes = CryptoJS.AES.decrypt(encryptedPassword, key);
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  return decrypted;
+};
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, Password } = req.body;
+    
+   const password = decryptPassword(Password);
+  
+  //  console.log("this is pass" + password);
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid Email" });
     }
 
-    // console.log("Stored hashed password:", user.password); // Log the stored password hash
-    // console.log("Entered password:", password); // Log the entered password
-
-    // Check password (using the model's comparePassword method)
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -90,7 +101,7 @@ export const register = async (req: Request, res: Response) => {
         userData.roomNumber = roomNumber;
         break;
       case "parent":
-        userData.children = []; // Always initialize as empty array
+        userData.children = []; 
         // Explicitly set parentId to undefined for parents
         userData.parentId = undefined;
         userData.roomNumber = undefined;
@@ -144,7 +155,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
     const { resetToken, user } = await generateResetToken(email);
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetLink = `https://hostel-frontend-fx5j.vercel.app/reset-password?token=${resetToken}`;
     await sendResetPasswordEmail(user.email);
     res.status(200).json({ message: "Password reset email sent" });
   } catch (error: any) {
