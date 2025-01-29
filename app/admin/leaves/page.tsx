@@ -1,9 +1,9 @@
 "use client";
 import { API_BASE_URL } from "@/app/config/api";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getToken } from "@/app/utils/auth";
 import { useRouter } from "next/navigation";
-
+import { toast } from "react-hot-toast";
 interface Review {
   status: "pending" | "approved" | "rejected";
   remarks?: string;
@@ -41,7 +41,8 @@ const AllLeaves = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
+  const [selectedLeave, setSelectedLeave] = useState<Leave | null>(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const fetchLeaves = async () => {
     try {
       const token = getToken();
@@ -67,6 +68,37 @@ const AllLeaves = () => {
       setLoading(false);
     }
   };
+  const handleDeleteleave = async (staffId: string) => {
+    try {
+      if (!selectedLeave) return;
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/delete-leave/${selectedLeave._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        // Show success toast with staff member's name
+        toast.success(
+          `Staff member ${selectedLeave?.studentId.firstName} ${selectedLeave?.studentId.lastName} has been deleted successfully`
+        );
+        fetchLeaves(); // Refresh the list
+        setShowLeaveModal(false);
+        setSelectedLeave(null);
+      } else {
+        toast.error(data.message || "Failed to delete staff member");
+      }
+    } catch (error) {
+      console.error("Error deleting staff member:", error);
+      toast.error("Failed to delete staff member");
+    }
+  };
+
 
   useEffect(() => {
     fetchLeaves();
@@ -217,6 +249,56 @@ const AllLeaves = () => {
                         Applied on:{" "}
                         {new Date(leave.createdAt).toLocaleDateString()}
                       </span>
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/admin/leaves/edit-leaves?id=${leave._id}`
+                          )
+                        }
+                        className="text-blue-600 hover:text-blue-900 dark:hover:text-blue-400 text-sm font-medium"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedLeave(leave);
+                          setShowLeaveModal(true);
+                        }}
+                        className="text-red-600 hover:text-red-900 dark:hover:text-red-400 text-sm font-medium"
+                      >
+                        Delete
+                      </button>
+                      {showLeaveModal && selectedLeave && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-[90%]">
+                            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                              Confirm Delete
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                              Are you sure you want to delete {selectedLeave.studentId.firstName}{" "}
+                              {selectedLeave.studentId.lastName}? This action cannot be undone.
+                            </p>
+                            <div className="flex justify-end gap-4">
+                              <button
+                                onClick={() => {
+                                  setShowLeaveModal(false);
+                                  setSelectedLeave(null);
+                                }}
+                                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => handleDeleteleave(selectedLeave._id)}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   </div>
 
@@ -359,6 +441,7 @@ const AllLeaves = () => {
                             ).toLocaleDateString()}
                           </p>
                         )}
+
                       </div>
                     </div>
                   </div>
