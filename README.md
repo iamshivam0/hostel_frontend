@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hostel Management System - Frontend
 
 This project is the frontend for a comprehensive Hostel Management System, built with Next.js and TypeScript.
@@ -62,3 +63,6 @@ For more information on the technologies used:
 ## Deployment
 
 This application is designed to be easily deployed on Vercel. Refer to the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for detailed instructions.
+=======
+# hostel_backend
+>>>>>>> d27146d6d211cb8143884d9d84a592159e535dde
