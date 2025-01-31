@@ -176,21 +176,24 @@ export default function StudentDashboard() {
                 |
               </span>
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Student Portal
+                Student
               </span>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Mobile-optimized buttons */}
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={() => setIsAnnouncementModalOpen(true)}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
               >
-                📢 Announcements
+                <span className="hidden sm:inline">📢 Announcements</span>
+                <span className="sm:hidden">📢</span>
               </button>
               <button
                 onClick={() => setIsMenuModalOpen(true)}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
               >
-                View Menu
+                <span className="hidden sm:inline">View Menu</span>
+                <span className="sm:hidden">🍽️</span>
               </button>
               <button
                 onClick={toggleTheme}
@@ -202,7 +205,8 @@ export default function StudentDashboard() {
                 onClick={logout}
                 className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-xl transition-all duration-200"
               >
-                Logout
+                <span className="hidden sm:inline">Logout</span>
+                <span className="sm:hidden">↪️</span>
               </button>
             </div>
           </div>
@@ -212,29 +216,26 @@ export default function StudentDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
-            <div className="flex items-center gap-6">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-4 sm:p-8 text-white shadow-lg">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               {/* Profile Image */}
               <div className="flex-shrink-0">
                 <img
-                  src={imagePreview || "/default-avatar.png"} // Fallback to default avatar
+                  src={imagePreview || "/default-avatar.png"}
                   alt={`${user.firstName}'s profile`}
-                  className="w-20 h-20 rounded-full border-4 border-white/20 object-cover"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/20 object-cover"
                 />
               </div>
 
               {/* Welcome Text */}
-              <div>
-                <h2
-                  className="text-3xl font-bold mb-2"
-                  aria-label={`Welcome back, ${user.firstName}`}
-                >
+              <div className="text-center sm:text-left">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">
                   Welcome back, {user.firstName} 👋
                 </h2>
                 <p className="text-blue-100">
                   Room Number: <strong>{user.roomNumber}</strong>
                 </p>
-                <p className="text-blue-100">
+                <p className="text-blue-100 text-sm sm:text-base">
                   Access all your hostel services from your personal dashboard.
                 </p>
               </div>
@@ -243,7 +244,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -345,10 +346,10 @@ export default function StudentDashboard() {
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Quick Actions
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <button
             onClick={() => router.push("/student/apply-leave")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -375,7 +376,7 @@ export default function StudentDashboard() {
 
           <button
             onClick={() => router.push("/student/showleaves")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -402,7 +403,7 @@ export default function StudentDashboard() {
 
           <button
             onClick={() => router.push("/student/profile")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -429,7 +430,7 @@ export default function StudentDashboard() {
 
           <button
             onClick={() => router.push("/student/myroommates")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -455,7 +456,7 @@ export default function StudentDashboard() {
           </button>
           <button
             onClick={() => router.push("/student/complaints")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -481,7 +482,7 @@ export default function StudentDashboard() {
           </button>
           <button
             onClick={() => router.push("/student/announcement")}
-            className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
@@ -511,7 +512,7 @@ export default function StudentDashboard() {
               work in progress
             </p>
           </button>
-          <button className="group p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105">
+          <button className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105">
             <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
               <svg
                 className="w-8 h-8 text-purple-600 dark:text-purple-400"

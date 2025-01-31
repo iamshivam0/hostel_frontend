@@ -100,27 +100,29 @@ export default function AdminDashboard() {
       <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
+            {/* Logo and Title - Made responsive */}
+            <div className="flex items-center gap-2 overflow-hidden">
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text whitespace-nowrap">
                 HMS
               </h1>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-500 dark:text-gray-400 hidden xs:inline">
                 |
               </span>
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate hidden xs:inline">
                 Admin Portal
               </span>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Action Buttons - Made responsive */}
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="p-1.5 sm:p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
               >
                 {theme === "dark" ? "🌞" : "🌙"}
               </button>
               <button
                 onClick={logout}
-                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-xl transition-all duration-200"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-xl transition-all duration-200"
               >
                 Logout
               </button>
@@ -129,32 +131,34 @@ export default function AdminDashboard() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-8 text-white shadow-lg">
-            <h2 className="text-3xl font-bold mb-2">Import Data 📊</h2>
-            <p className="text-blue-100">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Welcome Section - Made responsive */}
+        <div className="mb-4 sm:mb-8">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-xl sm:rounded-2xl p-4 sm:p-8 text-white shadow-lg">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
+              Import Data 📊
+            </h2>
+            <p className="text-blue-100 text-sm sm:text-base">
               Upload CSV files to bulk import or update student and staff data.
             </p>
           </div>
         </div>
 
-        {/* Upload Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+        {/* Upload Section - Made responsive */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                 CSV File Upload
               </h3>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Bulk Import Tool
               </span>
             </div>
 
             <form onSubmit={handleSubmit}>
               <div
-                className={`border-2 border-dashed rounded-xl p-8 mb-6 text-center transition-all duration-200 ${
+                className={`border-2 border-dashed rounded-lg sm:rounded-xl p-4 sm:p-8 mb-4 sm:mb-6 text-center transition-all duration-200 ${
                   isDragging
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                     : "border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500"
@@ -172,12 +176,12 @@ export default function AdminDashboard() {
                 />
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer block space-y-4"
+                  className="cursor-pointer block space-y-3 sm:space-y-4"
                 >
                   <div className="text-gray-600 dark:text-gray-300">
-                    <div className="mx-auto h-16 w-16 mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                       <svg
-                        className="h-8 w-8 text-blue-600 dark:text-blue-400"
+                        className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 dark:text-blue-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -190,24 +194,25 @@ export default function AdminDashboard() {
                         />
                       </svg>
                     </div>
-                    <p className="text-lg font-medium">
+                    <p className="text-base sm:text-lg font-medium">
                       {file
                         ? file.name
                         : "Drag and drop your CSV file here, or click to browse"}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
                       Supported format: CSV
                     </p>
                   </div>
                 </label>
               </div>
 
+              {/* File Preview - Made responsive */}
               {file && (
-                <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 rounded-xl px-4 py-3 mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 mb-4 sm:mb-6">
+                  <div className="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
+                    <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
                       <svg
-                        className="h-5 w-5 text-blue-600 dark:text-blue-400"
+                        className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -220,24 +225,25 @@ export default function AdminDashboard() {
                         />
                       </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
                       {file.name}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setFile(null)}
-                    className="text-sm font-medium text-red-500 hover:text-red-600 dark:hover:text-red-400"
+                    className="text-xs sm:text-sm font-medium text-red-500 hover:text-red-600 dark:hover:text-red-400 flex-shrink-0"
                   >
                     Remove
                   </button>
                 </div>
               )}
 
+              {/* Submit Button - Made responsive */}
               <button
                 type="submit"
                 disabled={!file}
-                className={`w-full py-3 px-6 rounded-xl font-medium text-white transition-all duration-200 ${
+                className={`w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium text-white transition-all duration-200 ${
                   file
                     ? "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 cursor-pointer"
                     : "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
@@ -246,9 +252,10 @@ export default function AdminDashboard() {
                 {file ? "Upload CSV" : "Select a file to upload"}
               </button>
 
+              {/* Message - Made responsive */}
               {message && (
                 <div
-                  className={`mt-4 p-4 rounded-xl text-sm font-medium ${
+                  className={`mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium ${
                     message.type === "success"
                       ? "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-200"
                       : "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200"
