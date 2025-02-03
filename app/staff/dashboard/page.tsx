@@ -52,7 +52,7 @@ export default function StaffDashboard() {
       }
 
       const stats = await response.json();
-      console.log(stats);
+      // console.log(stats);
       setLeaveStats(stats);
     } catch (error) {
       console.error("Error fetching leave stats:", error);
