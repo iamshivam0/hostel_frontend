@@ -33,7 +33,7 @@ export default function CreateStudent() {
           role: "student", // Explicitly set role as student
         }),
       });
-      console.log(formData);
+      // console.log(formData);
 
       const data = await response.json();
 

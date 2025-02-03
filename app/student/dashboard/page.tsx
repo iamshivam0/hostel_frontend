@@ -133,7 +133,7 @@ export default function StudentDashboard() {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const userData = JSON.parse(storedUser);
-        console.log("Profile picture URL:", userData.profileImage);
+        // console.log("Profile picture URL:", userData.profileImage);
       } else {
         console.log("User is not found in localStorage.");
       }

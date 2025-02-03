@@ -216,6 +216,8 @@ export default function ComplaintsPage() {
       );
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Update error details:", errorData);
         throw new Error("Failed to update complaint");
       }
 
@@ -316,10 +318,9 @@ export default function ComplaintsPage() {
                     type="button"
                     onClick={() => setType(option)}
                     className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 
-                      ${
-                        type === option
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105 border-transparent"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                      ${type === option
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105 border-transparent"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
                       }`}
                   >
                     <span className="flex items-center gap-2">
@@ -368,10 +369,9 @@ export default function ComplaintsPage() {
                       )
                     }
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
-                      ${
-                        sortBy === type
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                      ${sortBy === type
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                       }`}
                   >
                     <span className="flex items-center gap-2">
