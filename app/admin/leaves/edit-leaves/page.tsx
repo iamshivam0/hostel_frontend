@@ -85,7 +85,7 @@ const EditLeaves = () => {
     try {
       setProcessing(true);
       const token = getToken();
-      const response = await fetch(`${API_BASE_URL}/api/staff/leaves/${leaveId}/review`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/leaves/${leaveId}/review`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
