@@ -62,15 +62,26 @@ const ParentLeaveRequests = () => {
       });
 
       if (!response.ok) {
+        console.log("in !response block");
         throw new Error("Failed to fetch leaves");
       }
 
+
+
       const data = await response.json();
-      setLeaves(data);
+      // console.log(data);
+      // if (!data) {
+      //   setLeaves([]);
+      // } else {
+      // }
+      setLeaves(data.leaves);
+      // if(data.length)
+      // console.log(data.length);
+
     } catch (error) {
       console.error("Error fetching leaves:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to fetch leaves"
+        error instanceof Error ? error.message : ""
       );
     } finally {
       setLoading(false);
