@@ -43,7 +43,7 @@ const ParentLeaveRequests = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is parent
+
     if (!hasRole(["parent"])) {
       router.push("/login");
       return;
@@ -82,34 +82,60 @@ const ParentLeaveRequests = () => {
     action: "approve" | "reject",
     remarks: string
   ) => {
-    try {
-      const token = getToken();
-      const response = await fetch(
-        `${API_BASE_URL}/api/parent/leaves/${leaveId}/review`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action, remarks }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `Failed to ${action} leave`);
-      }
-
-      alert(data.message || `Leave ${action}ed successfully`);
-      fetchLeaves();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : `Failed to ${action} leave`;
-      console.error(`Error ${action}ing leave:`, errorMessage);
-      alert(errorMessage);
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
     }
+
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+
+        const reviewPayload = {
+          action,
+          remarks,
+          currentParentLocation: {
+            type: "Point",
+            coordinates: [longitude, latitude],
+          },
+        };
+
+        try {
+          const token = getToken();
+          const response = await fetch(
+            `${API_BASE_URL}/api/parent/leaves/${leaveId}/review`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(reviewPayload),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || `Failed to ${action} leave`);
+          }
+
+          alert(data.message || `Leave ${action}ed successfully`);
+          fetchLeaves();
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : `Failed to ${action} leave`;
+          console.error(`Error ${action}ing leave:`, errorMessage);
+          alert(errorMessage);
+        }
+      },
+      (geoError) => {
+        console.error("Error obtaining geolocation:", geoError);
+        alert("Failed to obtain your current location. Please allow location access.");
+      }
+    );
   };
 
   return (
@@ -236,8 +262,8 @@ const ParentLeaveRequests = () => {
                     <span className="px-4 py-2 rounded-xl text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">
                       {leave.leaveType
                         ? `${leave.leaveType
-                            .charAt(0)
-                            .toUpperCase()}${leave.leaveType.slice(1)} Leave`
+                          .charAt(0)
+                          .toUpperCase()}${leave.leaveType.slice(1)} Leave`
                         : "Leave Request"}
                     </span>
                   </div>
@@ -303,13 +329,12 @@ const ParentLeaveRequests = () => {
                             Parent Review
                           </span>
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-lg ${
-                              leave.parentReview?.status === "approved"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                                : leave.parentReview?.status === "rejected"
+                            className={`px-2 py-1 text-xs font-medium rounded-lg ${leave.parentReview?.status === "approved"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : leave.parentReview?.status === "rejected"
                                 ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                                 : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                            }`}
+                              }`}
                           >
                             {leave.parentReview?.status || "Pending"}
                           </span>
@@ -327,13 +352,12 @@ const ParentLeaveRequests = () => {
                             Staff Review
                           </span>
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-lg ${
-                              leave.staffReview?.status === "approved"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                                : leave.staffReview?.status === "rejected"
+                            className={`px-2 py-1 text-xs font-medium rounded-lg ${leave.staffReview?.status === "approved"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : leave.staffReview?.status === "rejected"
                                 ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                                 : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                            }`}
+                              }`}
                           >
                             {leave.staffReview?.status || "Pending"}
                           </span>

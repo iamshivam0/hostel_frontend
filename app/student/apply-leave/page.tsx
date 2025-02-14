@@ -19,6 +19,7 @@ export default function ApplyLeave() {
     contactNumber: "",
     parentContact: "",
     address: "",
+    leaveLocation: ""
   });
 
   if (!user) {
@@ -30,31 +31,56 @@ export default function ApplyLeave() {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/student/leaves/apply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        router.push("/student/dashboard?success=leave-applied");
-      } else {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to submit application");
-      }
-    } catch (error) {
-      console.error("Error submitting leave application:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to submit application"
-      );
-    } finally {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
       setIsSubmitting(false);
+      return;
     }
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Create a new payload by overriding the leaveLocation field
+        const dataToSend = {
+          ...formData,
+          leaveLocation: {
+            type: "Point",
+            coordinates: [longitude, latitude], // GeoJSON expects [longitude, latitude]
+          },
+        };
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/student/leaves/apply`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify(dataToSend),
+          });
+
+          if (response.ok) {
+            router.push("/student/dashboard?success=leave-applied");
+          } else {
+            const data = await response.json();
+            throw new Error(data.message || "Failed to submit application");
+          }
+        } catch (error) {
+          console.error("Error submitting leave application:", error);
+          setError(
+            error instanceof Error ? error.message : "Failed to submit application"
+          );
+        } finally {
+          setIsSubmitting(false);
+        }
+      },
+      (geoError) => {
+        console.error("Error obtaining geolocation:", geoError);
+        setError("Failed to obtain your current location. Please allow location access.");
+        setIsSubmitting(false);
+      }
+    );
+
   };
 
   const handleChange = (
@@ -263,9 +289,8 @@ export default function ApplyLeave() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-6 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${
-                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-6 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
