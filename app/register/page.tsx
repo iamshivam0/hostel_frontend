@@ -12,6 +12,10 @@ interface FormData {
   lastName: string;
   role: string;
   roomNumber?: string;
+  location?: {
+    type: "Point";
+    coordinates: number[];
+  };
 }
 
 export default function RegisterPage() {
@@ -41,46 +45,72 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      // Store the token in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Redirect to dashboard
-      // Redirect based on user role
-      const redirectPath =
-        data.user.role === "student"
-          ? "/student/dashboard"
-          : data.user.role === "staff"
-          ? "/staff/dashboard"
-          : data.user.role === "parent"
-          ? "/parent/dashboard"
-          : "/admin/dashboard";
-
-      router.push(redirectPath);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
       setLoading(false);
+      return;
     }
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const dataToSend: FormData = {
+          ...formData,
+          location: {
+            type: "Point",
+            coordinates: [longitude, latitude],
+          },
+        };
+
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataToSend),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Registration failed");
+          }
+
+
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+
+          const redirectPath =
+            data.user.role === "student"
+              ? "/student/dashboard"
+              : data.user.role === "staff"
+                ? "/staff/dashboard"
+                : data.user.role === "parent"
+                  ? "/parent/dashboard"
+                  : "/admin/dashboard";
+
+          router.push(redirectPath);
+        } catch (err) {
+          setError(
+            err instanceof Error ? err.message : "Something went wrong"
+          );
+        } finally {
+          setLoading(false);
+        }
+      },
+      (geoError) => {
+        console.error("Error obtaining location:", geoError);
+        setError(
+          "Failed to obtain your current location. Please allow location access."
+        );
+        setLoading(false);
+      }
+    );
   };
 
   return (
@@ -246,9 +276,8 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full px-4 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`w-full px-4 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
