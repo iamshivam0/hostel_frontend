@@ -79,8 +79,7 @@ const EditLeaves = () => {
   const handleAction = async (action: "approve" | "reject") => {
     if (!leaveId) return;
 
-    const remarks = prompt(`Enter remarks for ${action}:`);
-    if (remarks === null) return;
+
 
     try {
       setProcessing(true);
@@ -91,7 +90,7 @@ const EditLeaves = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action, remarks }),
+        body: JSON.stringify({ action }),
       });
 
       if (!response.ok) throw new Error("Failed to update leave status");
