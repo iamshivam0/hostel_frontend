@@ -13,6 +13,7 @@ export default function CreateParent() {
     lastName: "",
     email: "",
     password: "",
+    location: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +29,7 @@ export default function CreateParent() {
         },
         body: JSON.stringify({
           ...formData,
-          role: "parent", // Explicitly set role as parent
+          role: "parent",
         }),
       });
 
