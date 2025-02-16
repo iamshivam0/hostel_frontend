@@ -1,10 +1,16 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["res.cloudinary.com"], // Add your image domains here
+    domains: ['res.cloudinary.com'],
   },
-  /* config options here */
+  reactStrictMode: true,
+
 };
 
-export default nextConfig;
+export default withPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+})(nextConfig);
