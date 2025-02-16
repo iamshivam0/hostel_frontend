@@ -3,12 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "./providers/theme-provider";
+import Head from "next/head";
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#111827" />
+      </Head>
       {/* Navigation Bar */}
       <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
