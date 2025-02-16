@@ -8,18 +8,12 @@ export const metadata = {
   description: "Hostel APP",
   start_url: "/",
   display: "standalone",
-  icons: [
-    {
-      "src": "/icons/icon-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ]
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512x512.png", type: "image/png", sizes: "512x512" }
+    ]
+  }
 };
 
 export function generateViewport() {
