@@ -1,7 +1,6 @@
 import { FeatureItem, UserRole } from '@/types';
 
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://hostel-backend-new.onrender.com';
-export const ENCRYPTION_KEY = process.env.EXPO_PUBLIC_ENCRYPTION_KEY || 'thisisthekey';
 
 export const roleFeatureMap: Record<UserRole, FeatureItem[]> = {
   student: [

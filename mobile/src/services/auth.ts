@@ -1,6 +1,5 @@
-import CryptoJS from 'crypto-js';
 import { User } from '@/types';
-import { API_BASE_URL, ENCRYPTION_KEY } from '@/utils/constants';
+import { API_BASE_URL } from '@/utils/constants';
 
 type LoginResponse = {
   token: string;
@@ -9,14 +8,12 @@ type LoginResponse = {
 };
 
 export async function loginWithCredentials(email: string, password: string): Promise<LoginResponse> {
-  const encryptedPassword = CryptoJS.AES.encrypt(password, ENCRYPTION_KEY).toString();
-
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, Password: encryptedPassword }),
+    body: JSON.stringify({ email, Password: password }),
   });
 
   const data = (await response.json()) as LoginResponse;

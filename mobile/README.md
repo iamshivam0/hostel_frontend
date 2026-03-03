@@ -25,7 +25,6 @@ Create `mobile/.env`:
 
 ```bash
 EXPO_PUBLIC_API_BASE_URL=https://hostel-backend-new.onrender.com
-EXPO_PUBLIC_ENCRYPTION_KEY=thisisthekey
 ```
 
 ## Run locally
