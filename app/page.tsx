@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "./providers/theme-provider";
-
+import { getUser } from "./utils/auth";
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
+  const user = typeof window !== "undefined" ? getUser() : null;
+  const isWebUser = user && ["admin", "staff"].includes(user.role);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -17,7 +18,7 @@ export default function Home() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
             </div>
             <div className="flex items-center gap-4">
@@ -25,18 +26,29 @@ export default function Home() {
                 {theme === "dark" ? "🌞" : "🌙"}
               </button>
               <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                >
-                  Sign Up
-                </Link>
+                {isWebUser ? (
+                  <Link
+                    href={user?.role === "staff" ? "/staff/dashboard" : "/org-admin"}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -53,7 +65,7 @@ export default function Home() {
                 Welcome to
               </span>
               <span className="block bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text leading-normal pb-2">
-                Hostel Management System
+                NIVAS
               </span>
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -168,7 +180,7 @@ export default function Home() {
       <footer className="border-t border-gray-200 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-gray-600 dark:text-gray-400">
-            © 2024 Hostel Management System. All rights reserved.
+            © 2024 NIVAS. All rights reserved.
           </p>
         </div>
       </footer>

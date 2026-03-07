@@ -1,6 +1,6 @@
 {
-  "name": "hostel",
-  "version": "0.1.0",
+  "name": "nivas",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "firebase": "^11.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",

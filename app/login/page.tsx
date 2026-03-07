@@ -1,69 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useTheme } from "../providers/theme-provider";
+import { useTheme } from "@/app/providers/theme-provider";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, Password: password }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Store the token and user data in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Redirect based on user role
-      const redirectPath =
-        data.user.role === "student"
-          ? "/student/dashboard"
-          : data.user.role === "staff"
-          ? "/staff/dashboard"
-          : data.user.role === "parent"
-          ? "/parent/dashboard"
-          : "/admin/dashboard";
-
-      router.push(redirectPath);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
+    const result = await login(email.trim(), password);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error ?? "Login failed");
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black transition-colors duration-200 p-4">
       <div className="w-full max-w-md">
-        {/* Card Container */}
         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-xl dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-800 p-8 space-y-6 relative">
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="absolute top-6 right-6 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -72,23 +36,21 @@ export default function LoginPage() {
             {theme === "dark" ? "🌞" : "🌙"}
           </button>
 
-          {/* Logo & Header */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-              HMS
+              NIVAS
             </h1>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
               Welcome back
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Sign in to your account to continue
+              Sign in to your account (Admin & Staff only)
             </p>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 p-4 rounded-xl text-sm flex items-center gap-2">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -99,7 +61,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Login Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
@@ -173,7 +134,7 @@ export default function LoginPage() {
               }`}
             >
               {loading ? (
-                <div className="flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle
                       className="opacity-25"
@@ -191,17 +152,16 @@ export default function LoginPage() {
                     />
                   </svg>
                   Signing in...
-                </div>
+                </span>
               ) : (
                 "Sign in"
               )}
             </button>
           </form>
 
-          {/* Register Link */}
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
+              Don&apos;t have an organization?{" "}
               <Link
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"

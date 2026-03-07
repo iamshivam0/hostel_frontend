@@ -1,6 +1,6 @@
-# Hostel Management System - Frontend
+# NIVAS - Frontend
 
-This project is the frontend for a comprehensive Hostel Management System, built with Next.js and TypeScript.
+This project is the frontend for NIVAS, built with Next.js and TypeScript.
 
 ## Features
 

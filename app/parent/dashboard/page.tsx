@@ -6,6 +6,7 @@ import { getUser, logout, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
+import NotificationsBell from "@/app/components/NotificationsBell";
 
 interface ChildStats {
   children: Array<{
@@ -62,7 +63,7 @@ export default function ParentDashboard() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
@@ -72,6 +73,10 @@ export default function ParentDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <NotificationsBell
+                announcementsApiPath="/api/parent/announcements"
+                viewAllHref="/parent/announcements"
+              />
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"

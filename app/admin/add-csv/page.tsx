@@ -103,7 +103,7 @@ export default function AdminDashboard() {
             {/* Logo and Title - Made responsive */}
             <div className="flex items-center gap-2 overflow-hidden">
               <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text whitespace-nowrap">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400 hidden xs:inline">
                 |

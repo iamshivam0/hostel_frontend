@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
-import { API_BASE_URL } from "@/app/config/api";
+import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
 
 interface Student {
@@ -36,18 +36,9 @@ export default function ViewStudent() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/students`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch students");
-      }
-
-      const data = await response.json();
-      setStudents(data);
+      const res = await api.get<{ data: Student[] }>("/api/admin/students");
+      const list = Array.isArray(res?.data) ? res.data : [];
+      setStudents(list.map((s) => ({ ...s, _id: (s as { id?: string }).id ?? s._id })));
     } catch (error) {
       console.error("Error fetching students:", error);
       toast.error("Failed to fetch students");
@@ -58,27 +49,13 @@ export default function ViewStudent() {
 
   const handleDeleteStudent = async (studentId: string) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/delete-student/${studentId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      await api.delete(`/api/admin/delete-student/${studentId}`);
+      toast.success(
+        `Student ${selectedStudent?.firstName} ${selectedStudent?.lastName} has been deleted successfully`
       );
-
-      const data = await response.json();
-      if (data.success) {
-        toast.success(
-          `Student ${selectedStudent?.firstName} ${selectedStudent?.lastName} has been deleted successfully`
-        );
-        fetchStudents();
-        setShowDeleteModal(false);
-        setSelectedStudent(null);
-      } else {
-        toast.error(data.message || "Failed to delete student");
-      }
+      setShowDeleteModal(false);
+      setSelectedStudent(null);
+      await fetchStudents();
     } catch (error) {
       console.error("Error deleting student:", error);
       toast.error("Failed to delete student");
@@ -101,7 +78,7 @@ export default function ViewStudent() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
