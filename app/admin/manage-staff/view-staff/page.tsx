@@ -1,28 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
-import { API_BASE_URL } from "@/app/config/api";
+import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
+import Pagination from "@/app/components/Pagination";
 
 interface Staff {
   _id: string;
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber?: string;
 }
 
+interface StaffListResponse {
+  data: Staff[];
+  total: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+const DEFAULT_PAGE_SIZE = 10;
+
 export default function ViewStaff() {
   const router = useRouter();
   const { theme } = useTheme();
   const [staffMembers, setStaffMembers] = useState<Staff[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+
+  const fetchStaffMembers = useCallback(async (page = 1) => {
+    try {
+      setLoading(true);
+      const res = await api.get<StaffListResponse>(
+        `/api/admin/getallstaffs?pageNumber=${page}&pageSize=${DEFAULT_PAGE_SIZE}`
+      );
+      const list = res?.data ?? [];
+      setStaffMembers(
+        list.map((s) => ({
+          ...s,
+          _id: s._id ?? (s as { id?: string }).id ?? "",
+        }))
+      );
+      setTotal(res?.total ?? 0);
+      setPageNumber(res?.pageNumber ?? 1);
+      setTotalPages(res?.totalPages ?? 0);
+    } catch (error) {
+      console.error("Error fetching staff members:", error);
+      toast.error("Failed to fetch staff members");
+      setStaffMembers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const user = getUser();
@@ -30,56 +70,22 @@ export default function ViewStaff() {
       router.push("/login");
       return;
     }
-    fetchStaffMembers();
+    fetchStaffMembers(pageNumber);
+  }, [router, pageNumber, fetchStaffMembers]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setPageNumber(page);
   }, []);
-
-  const fetchStaffMembers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/getallstaffs`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch staff members");
-      }
-
-      const data = await response.json();
-      setStaffMembers(data);
-    } catch (error) {
-      console.error("Error fetching staff members:", error);
-      toast.error("Failed to fetch staff members");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteStaff = async (staffId: string) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/delete-staff/${staffId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      await api.delete(`/api/admin/delete-staff/${staffId}`);
+      toast.success(
+        `Staff member ${selectedStaff?.firstName} ${selectedStaff?.lastName} has been deleted successfully`
       );
-
-      const data = await response.json();
-      if (data.success) {
-        // Show success toast with staff member's name
-        toast.success(
-          `Staff member ${selectedStaff?.firstName} ${selectedStaff?.lastName} has been deleted successfully`
-        );
-        fetchStaffMembers(); // Refresh the list
-        setShowDeleteModal(false);
-        setSelectedStaff(null);
-      } else {
-        toast.error(data.message || "Failed to delete staff member");
-      }
+      setShowDeleteModal(false);
+      setSelectedStaff(null);
+      await fetchStaffMembers(pageNumber);
     } catch (error) {
       console.error("Error deleting staff member:", error);
       toast.error("Failed to delete staff member");
@@ -102,7 +108,7 @@ export default function ViewStaff() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
@@ -254,6 +260,15 @@ export default function ViewStaff() {
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <Pagination
+              page={pageNumber}
+              totalPages={totalPages}
+              total={total}
+              pageSize={DEFAULT_PAGE_SIZE}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </main>
 

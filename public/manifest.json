@@ -1,11 +1,11 @@
 {
-  "name": "HMS",
-  "short_name": "HMS",
+  "name": "NIVAS",
+  "short_name": "NIVAS",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#111827",
-  "description": "This is a hostel managment App",
+  "description": "This is NIVAS",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",

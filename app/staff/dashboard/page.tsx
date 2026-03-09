@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, logout, hasRole } from "@/app/utils/auth";
+import { getUser, hasRole } from "@/app/utils/auth";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
 import { API_BASE_URL } from "@/app/config/api";
 import MenuModal from "@/app/components/MenuModal";
 import AnnouncementModal from "@/app/components/AnnouncementModal";
+import NotificationsBell from "@/app/components/NotificationsBell";
+import EnableNotificationsButton from "@/app/components/EnableNotificationsButton";
 
 interface LeaveStats {
   pending: number;
@@ -18,6 +21,7 @@ interface LeaveStats {
 export default function StaffDashboard() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(getUser() as User | null);
   const [leaveStats, setLeaveStats] = useState<LeaveStats>({
     pending: 0,
@@ -98,7 +102,7 @@ export default function StaffDashboard() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
@@ -108,13 +112,11 @@ export default function StaffDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              <button
-                onClick={() => setIsAnnouncementModalOpen(true)}
-                className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-              >
-                <span className="hidden sm:inline">📢 Announcements</span>
-                <span className="sm:hidden">📢</span>
-              </button>
+              <EnableNotificationsButton />
+              <NotificationsBell
+                announcementsApiPath="/api/staff/announcements"
+                viewAllHref="/staff/announcements"
+              />
               <button
                 onClick={() => setIsMenuModalOpen(true)}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -129,7 +131,7 @@ export default function StaffDashboard() {
                 {theme === "dark" ? "🌞" : "🌙"}
               </button>
               <button
-                onClick={logout}
+                onClick={() => void logout()}
                 className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-xl transition-all duration-200"
               >
                 <span className="hidden sm:inline">Logout</span>

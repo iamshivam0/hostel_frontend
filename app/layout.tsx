@@ -1,11 +1,12 @@
 import { ThemeProvider } from "./providers/theme-provider";
+import { AuthProvider } from "./contexts/AuthContext";
 import "./globals.css";
 import Head from "next/head";
 export const metadata = {
   manifest: "/manifest.json",
-  name: "HMS",
-  short_name: "HMS",
-  description: "Hostel APP",
+  name: "NIVAS",
+  short_name: "NIVAS",
+  description: "NIVAS",
   start_url: "/",
   display: "standalone",
   icons: {
@@ -33,7 +34,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#111827" />
       </Head>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

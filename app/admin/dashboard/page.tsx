@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, logout, hasRole } from "@/app/utils/auth";
+import { getUser, hasRole } from "@/app/utils/auth";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { useTheme } from "@/app/providers/theme-provider";
 import { User } from "@/app/types/user";
+import NotificationsBell from "@/app/components/NotificationsBell";
+import EnableNotificationsButton from "@/app/components/EnableNotificationsButton";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(getUser() as User | null);
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
@@ -38,6 +42,12 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              <EnableNotificationsButton />
+              <NotificationsBell
+                announcementsApiPath="/api/admin/announcements"
+                viewAllHref="/admin/announcement/view"
+                createHref="/admin/announcement/create"
+              />
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -45,7 +55,7 @@ export default function AdminDashboard() {
                 {theme === "dark" ? "🌞" : "🌙"}
               </button>
               <button
-                onClick={logout}
+                onClick={() => void logout()}
                 className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-xl transition-all duration-200"
               >
                 <span className="hidden sm:inline">Logout</span>
@@ -237,6 +247,33 @@ export default function AdminDashboard() {
           </button>
 
           <button
+            onClick={() => router.push("/admin/announcement/create")}
+            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
+          >
+            <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
+              <svg
+                className="w-8 h-8 text-purple-600 dark:text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Create Announcement
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Post a new announcement to staff, students or parents
+            </p>
+          </button>
+
+          <button
             onClick={() => router.push("/admin/mess")}
             className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
           >
@@ -260,32 +297,6 @@ export default function AdminDashboard() {
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Manage mess menu and schedules
-            </p>
-          </button>
-          <button
-            onClick={() => router.push("/admin/announcement")}
-            className="group p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center hover:scale-105"
-          >
-            <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-200">
-              <svg
-                className="w-8 h-8 text-purple-600 dark:text-purple-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Announcements
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Manage and post announcements
             </p>
           </button>
           <button

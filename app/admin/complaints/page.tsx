@@ -1,9 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/providers/theme-provider";
-import { getUser, logout, hasRole } from "@/app/utils/auth";
+import { getUser, hasRole } from "@/app/utils/auth";
 import { User } from "@/app/types/user";
+import { api } from "@/app/lib/api";
+import Pagination from "@/app/components/Pagination";
 
 interface ComplaintType {
   _id: string;
@@ -33,48 +36,42 @@ export default function ComplaintsPage() {
   const [dateFilter, setDateFilter] = useState<
     "all" | "today" | "week" | "month"
   >("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [complaintPage, setComplaintPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [complaintTotalPages, setComplaintTotalPages] = useState(0);
+  const COMPLAINT_PAGE_SIZE = 10;
 
-  useEffect(() => {
-    const checkAuthAndFetch = async () => {
-      if (!user || !hasRole(["admin"])) {
-        router.push("/login");
-        return;
-      }
-      await fetchComplaints();
-    };
-
-    checkAuthAndFetch();
-  }, [user, router]);
-
-  const fetchComplaints = async () => {
+  const fetchComplaints = useCallback(async (page = 1) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/complaints`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch complaints");
+      setLoading(true);
+      const data = await api.get<{
+        success: boolean;
+        data: ComplaintType[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      }>(`/api/admin/complaints?page=${page}&limit=${COMPLAINT_PAGE_SIZE}`);
+      if (data?.success && Array.isArray(data.data)) {
+        setComplaints(data.data);
       }
-
-      const data = await response.json();
-      if (data.success && Array.isArray(data.complaints)) {
-        setComplaints(data.complaints);
-      }
+      setTotal(data?.total ?? 0);
+      setComplaintPage(data?.page ?? 1);
+      setComplaintTotalPages(data?.totalPages ?? 0);
     } catch (error) {
       console.error("Failed to fetch complaints:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!user || !hasRole(["admin"])) {
+      router.push("/login");
+      return;
+    }
+    fetchComplaints(complaintPage);
+  }, [user, router, complaintPage, fetchComplaints]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -144,11 +141,6 @@ export default function ComplaintsPage() {
   };
 
   const filteredComplaints = getFilteredComplaints();
-  const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
-  const paginatedComplaints = filteredComplaints.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const FilterButton = ({
     active,
@@ -182,7 +174,7 @@ export default function ComplaintsPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |
@@ -332,9 +324,9 @@ export default function ComplaintsPage() {
                   </th>
                 </tr>
               </thead>
-              {paginatedComplaints.length > 0 ? (
+              {filteredComplaints.length > 0 ? (
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {paginatedComplaints.map((complaint, index) => (
+                  {filteredComplaints.map((complaint, index) => (
                     <tr
                       key={`${complaint._id}-${index}`}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150"
@@ -387,29 +379,14 @@ export default function ComplaintsPage() {
           </div>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-4 flex justify-center gap-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="px-3 py-1">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+        {complaintTotalPages > 1 && (
+          <Pagination
+            page={complaintPage}
+            totalPages={complaintTotalPages}
+            total={total}
+            pageSize={COMPLAINT_PAGE_SIZE}
+            onPageChange={setComplaintPage}
+          />
         )}
       </main>
     </div>

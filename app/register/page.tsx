@@ -1,123 +1,50 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useTheme } from "../providers/theme-provider";
-
-interface FormData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  roomNumber?: string;
-  location?: {
-    type: "Point";
-    coordinates: number[];
-  };
-}
+import { useTheme } from "@/app/providers/theme-provider";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+  const { theme, toggleTheme } = useTheme();
+  const { orgSignup } = useAuth();
+  const [formData, setFormData] = useState({
+    orgName: "",
     email: "",
     password: "",
     firstName: "",
     lastName: "",
-    role: "student",
-    roomNumber: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
-      setLoading(false);
-      return;
+    const result = await orgSignup({
+      orgName: formData.orgName.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+    });
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error ?? "Signup failed");
     }
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
-        const dataToSend: FormData = {
-          ...formData,
-          location: {
-            type: "Point",
-            coordinates: [longitude, latitude],
-          },
-        };
-
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(dataToSend),
-            }
-          );
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.message || "Registration failed");
-          }
-
-
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-
-          const redirectPath =
-            data.user.role === "student"
-              ? "/student/dashboard"
-              : data.user.role === "staff"
-                ? "/staff/dashboard"
-                : data.user.role === "parent"
-                  ? "/parent/dashboard"
-                  : "/admin/dashboard";
-
-          router.push(redirectPath);
-        } catch (err) {
-          setError(
-            err instanceof Error ? err.message : "Something went wrong"
-          );
-        } finally {
-          setLoading(false);
-        }
-      },
-      (geoError) => {
-        console.error("Error obtaining location:", geoError);
-        setError(
-          "Failed to obtain your current location. Please allow location access."
-        );
-        setLoading(false);
-      }
-    );
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black transition-colors duration-200 p-4">
       <div className="w-full max-w-md">
         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-xl dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-800 p-8 space-y-6 relative">
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="absolute top-6 right-6 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -126,23 +53,22 @@ export default function RegisterPage() {
             {theme === "dark" ? "🌞" : "🌙"}
           </button>
 
-          {/* Logo & Header */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-              HMS
+              NIVAS
             </h1>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Create your account
+              Create your organization
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Join HMS today
+              Register as Org Admin — create your organization and first admin
+              account.
             </p>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 p-4 rounded-xl text-sm flex items-center gap-2">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -153,16 +79,34 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Registration Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="orgName"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Organization name
+                </label>
+                <input
+                  id="orgName"
+                  name="orgName"
+                  type="text"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                  placeholder="My Hostel Org"
+                  value={formData.orgName}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
                     htmlFor="firstName"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
-                    First Name
+                    First name
                   </label>
                   <input
                     id="firstName"
@@ -181,7 +125,7 @@ export default function RegisterPage() {
                     htmlFor="lastName"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
-                    Last Name
+                    Last name
                   </label>
                   <input
                     id="lastName"
@@ -196,7 +140,6 @@ export default function RegisterPage() {
                   />
                 </div>
               </div>
-
               <div>
                 <label
                   htmlFor="email"
@@ -210,13 +153,12 @@ export default function RegisterPage() {
                   type="email"
                   required
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  placeholder="john@example.com"
+                  placeholder="admin@example.com"
                   value={formData.email}
                   onChange={handleChange}
                   disabled={loading}
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="password"
@@ -229,6 +171,7 @@ export default function RegisterPage() {
                   name="password"
                   type="password"
                   required
+                  minLength={6}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                   placeholder="••••••••"
                   value={formData.password}
@@ -236,51 +179,17 @@ export default function RegisterPage() {
                   disabled={loading}
                 />
               </div>
-
-              <div>
-                <label htmlFor="role" className="sr-only">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="student">Student</option>
-                  {/* <option value="staff">Staff</option> */}
-                  <option value="parent">Parent</option>
-                </select>
-              </div>
-
-              {formData.role === "student" && (
-                <div>
-                  <label htmlFor="roomNumber" className="sr-only">
-                    Room Number
-                  </label>
-                  <input
-                    id="roomNumber"
-                    name="roomNumber"
-                    type="text"
-                    required
-                    className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Room Number"
-                    value={formData.roomNumber}
-                    onChange={handleChange}
-                  />
-                </div>
-              )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full px-4 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              className={`w-full px-4 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-500 dark:to-blue-400 dark:hover:from-blue-600 dark:hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {loading ? (
-                <div className="flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle
                       className="opacity-25"
@@ -298,14 +207,13 @@ export default function RegisterPage() {
                     />
                   </svg>
                   Creating account...
-                </div>
+                </span>
               ) : (
-                "Create account"
+                "Create organization"
               )}
             </button>
           </form>
 
-          {/* Login Link */}
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{" "}

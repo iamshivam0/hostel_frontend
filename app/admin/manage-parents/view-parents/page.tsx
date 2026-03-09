@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser, hasRole } from "@/app/utils/auth";
 import { useTheme } from "@/app/providers/theme-provider";
-import { API_BASE_URL } from "@/app/config/api";
+import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
 
 interface Student {
@@ -44,18 +44,9 @@ export default function ViewParents() {
   const fetchParents = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/parents`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch parents");
-      }
-
-      const data = await response.json();
-      setParents(data);
+      const res = await api.get<{ data: Parent[] }>("/api/admin/parents");
+      const list = Array.isArray(res?.data) ? res.data : [];
+      setParents(list.map((p) => ({ ...p, _id: (p as { id?: string }).id ?? p._id })));
     } catch (error) {
       console.error("Error fetching parents:", error);
       toast.error("Failed to fetch parents");
@@ -66,25 +57,11 @@ export default function ViewParents() {
 
   const handleDeleteParent = async (parentId: string) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/parent/${parentId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Parent deleted successfully");
-        fetchParents();
-        setShowDeleteModal(false);
-        setSelectedParent(null);
-      } else {
-        toast.error(data.message || "Failed to delete parent");
-      }
+      await api.delete(`/api/admin/parent/${parentId}`);
+      toast.success("Parent deleted successfully");
+      setShowDeleteModal(false);
+      setSelectedParent(null);
+      await fetchParents();
     } catch (error) {
       console.error("Error deleting parent:", error);
       toast.error("Failed to delete parent");
@@ -106,7 +83,7 @@ export default function ViewParents() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |

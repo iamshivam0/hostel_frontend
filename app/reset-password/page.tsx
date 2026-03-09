@@ -81,7 +81,7 @@ export default function ResetPassword() {
           {/* Logo & Header */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-              HMS
+              NIVAS
             </h1>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
               Reset Password

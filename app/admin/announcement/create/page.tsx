@@ -1,89 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
-import { API_BASE_URL } from "@/app/config/api";
+import { AnnouncementTargetAudience } from "@/app/types/announcement";
 
-interface AnnouncementFormData {
-  type: "student" | "general";
-  title: string;
-  content: string;
-  targetAudience?: "students" | "staff" | "all";
+const TARGET_AUDIENCE_OPTIONS: { value: string; label: string }[] = [
+  { value: AnnouncementTargetAudience.ALL, label: "All" },
+  { value: AnnouncementTargetAudience.STUDENTS, label: "Students only" },
+  { value: AnnouncementTargetAudience.STAFF, label: "Staff only" },
+  { value: AnnouncementTargetAudience.PARENTS, label: "Parents only" },
+  { value: AnnouncementTargetAudience.STUDENTS_STAFF, label: "Students and staff" },
+  { value: AnnouncementTargetAudience.STUDENTS_PARENTS, label: "Students and parents" },
+  { value: AnnouncementTargetAudience.STAFF_PARENTS, label: "Staff and parents" },
+];
+
+interface HostelOption {
+  id: number;
+  name: string;
+  studentCount?: number;
 }
 
 export default function CreateAnnouncement() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [targetAudience, setTargetAudience] = useState(AnnouncementTargetAudience.ALL);
+  const [hostels, setHostels] = useState<HostelOption[]>([]);
+  const [hostelIds, setHostelIds] = useState<number[]>([]);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<AnnouncementFormData>({
-    defaultValues: {
-      type: "general",
-      targetAudience: "all",
-    },
-  });
+  useEffect(() => {
+    api
+      .get<{ data: HostelOption[] }>("/api/admin/hostels?pageSize=100&pageNumber=1")
+      .then((res) => setHostels(res?.data ?? []))
+      .catch(() => setHostels([]));
+  }, []);
 
-  const announcementType = watch("type");
+  const onHostelToggle = (id: number) => {
+    setHostelIds((prev) =>
+      prev.includes(id) ? prev.filter((h) => h !== id) : [...prev, id]
+    );
+  };
 
-  const onSubmit = async (data: AnnouncementFormData) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      toast.error("Title and content are required");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const user = localStorage.getItem("user");
-      const userData = user ? JSON.parse(user) : null;
-
-      if (!userData) {
-        throw new Error("User not found");
-      }
-
-      const name = `${userData.firstName} ${userData.lastName}`;
-
-      // If type is student, remove targetAudience from payload
-      const payload =
-        data.type === "student"
-          ? {
-              type: data.type,
-              title: data.title,
-              content: data.content,
-              name,
-            }
-          : {
-              type: data.type,
-              title: data.title,
-              content: data.content,
-              name,
-              targetAudience: data.targetAudience,
-            };
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/createadminannouncment`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create announcement");
-      }
-
+      await api.post("/api/admin/announcements", {
+        title: title.trim(),
+        content: content.trim(),
+        targetAudience,
+        ...(hostelIds.length > 0 && { hostelIds }),
+      });
       toast.success("Announcement created successfully");
-      router.push("/admin/announcement");
+      router.push("/admin/announcement/view");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create announcement"
       );
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,11 +76,9 @@ export default function CreateAnnouncement() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                |
-              </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">|</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Create Announcement
               </span>
@@ -121,40 +99,19 @@ export default function CreateAnnouncement() {
             Create New Announcement
           </h2>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                Announcement Type
-              </label>
-              <select
-                {...register("type", { required: "Type is required" })}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
-              >
-                <option value="general">General Announcement</option>
-                <option value="student">Student Announcement</option>
-              </select>
-              {errors.type && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.type.message}
-                </p>
-              )}
-            </div>
-
+          <form onSubmit={onSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Title
               </label>
               <input
                 type="text"
-                {...register("title", { required: "Title is required" })}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter announcement title"
               />
-              {errors.title && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.title.message}
-                </p>
-              )}
             </div>
 
             <div>
@@ -162,39 +119,58 @@ export default function CreateAnnouncement() {
                 Content
               </label>
               <textarea
-                {...register("content", { required: "Content is required" })}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
                 rows={4}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter announcement content"
               />
-              {errors.content && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.content.message}
-                </p>
-              )}
             </div>
 
-            {announcementType === "general" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                Target audience
+              </label>
+              <select
+                value={targetAudience}
+                onChange={(e) => setTargetAudience(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                {TARGET_AUDIENCE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {hostels.length > 0 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Target Audience
+                  Limit to hostels (optional)
                 </label>
-                <select
-                  {...register("targetAudience", {
-                    required:
-                      "Target audience is required for general announcements",
-                  })}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700"
-                >
-                  <option value="all">All</option>
-                  <option value="students">Students Only</option>
-                  <option value="staff">Staff Only</option>
-                </select>
-                {errors.targetAudience && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.targetAudience.message}
-                  </p>
-                )}
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Leave unchecked for org-wide. Select one or more to send only to those hostels.
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {hostels.map((h) => (
+                    <label
+                      key={h.id}
+                      className="inline-flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 bg-white dark:bg-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={hostelIds.includes(h.id)}
+                        onChange={() => onHostelToggle(h.id)}
+                        className="rounded border-gray-300 dark:border-gray-600"
+                      />
+                      <span className="text-sm text-gray-900 dark:text-white">
+                        {h.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
 

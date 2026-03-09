@@ -136,28 +136,15 @@ export default function AssignParents() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const { api } = await import("@/app/lib/api");
       const [studentsRes, parentsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/admin/students`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }),
-        fetch(`${API_BASE_URL}/api/admin/parents`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }),
+        api.get<{ data: { _id?: string; id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/students"),
+        api.get<{ data: { _id?: string; id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/parents"),
       ]);
-
-      if (!studentsRes.ok || !parentsRes.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const studentsData = await studentsRes.json();
-      const parentsData = await parentsRes.json();
-
-      setStudents(studentsData);
-      setParents(parentsData);
+      const studentList = Array.isArray(studentsRes?.data) ? studentsRes.data : [];
+      const parentList = Array.isArray(parentsRes?.data) ? parentsRes.data : [];
+      setStudents(studentList.map((s) => ({ ...s, _id: s._id ?? s.id ?? "" })));
+      setParents(parentList.map((p) => ({ ...p, _id: p._id ?? p.id ?? "" })));
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to fetch data");
@@ -248,7 +235,7 @@ export default function AssignParents() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-400 dark:to-blue-300 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 |

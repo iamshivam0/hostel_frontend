@@ -26,15 +26,10 @@ const AssignRoomPage = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/students`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const data = await response.json();
-      setStudents(data);
+      const { api } = await import("@/app/lib/api");
+      const res = await api.get<{ data: { id?: string; _id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/students");
+      const list = Array.isArray(res?.data) ? res.data : [];
+      setStudents(list.map((s) => ({ ...s, _id: s._id ?? s.id ?? "" })));
     } catch (error) {
       console.error("Error fetching students:", error);
       toast.error("Failed to fetch students");
@@ -109,7 +104,7 @@ const AssignRoomPage = () => {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 text-transparent bg-clip-text">
-                HMS
+                NIVAS
               </h1>
               <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">

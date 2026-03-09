@@ -28,6 +28,7 @@ export const getToken = (): string | null => {
 export const logout = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
   window.location.href = "/login";
 };
 
