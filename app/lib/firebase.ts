@@ -1,8 +1,8 @@
 /**
  * Firebase app and messaging (client-only). Used for web push registration.
  */
-import { getApp, getApps, initializeApp } from "firebase/app";
-import { getMessaging, type FirebaseApp } from "firebase/messaging";
+import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

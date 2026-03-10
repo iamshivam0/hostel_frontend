@@ -27,9 +27,9 @@ const AssignRoomPage = () => {
   const fetchStudents = async () => {
     try {
       const { api } = await import("@/app/lib/api");
-      const res = await api.get<{ data: { id?: string; _id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/students");
+      const res = await api.get<{ data: { id?: string; _id?: string; firstName: string; lastName: string; email: string; roomNumber?: string | null }[] }>("/api/admin/students");
       const list = Array.isArray(res?.data) ? res.data : [];
-      setStudents(list.map((s) => ({ ...s, _id: s._id ?? s.id ?? "" })));
+      setStudents(list.map((s) => ({ ...s, _id: s._id ?? s.id ?? "", roomNumber: s.roomNumber ?? null })));
     } catch (error) {
       console.error("Error fetching students:", error);
       toast.error("Failed to fetch students");

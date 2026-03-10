@@ -46,8 +46,8 @@ export default function ManageParents() {
     try {
       const { api } = await import("@/app/lib/api");
       const [studentsRes, parentsRes] = await Promise.all([
-        api.get<{ data: unknown[] }>("/api/admin/students"),
-        api.get<{ data: unknown[] }>("/api/admin/parents"),
+        api.get<{ data: Student[] }>("/api/admin/students"),
+        api.get<{ data: Parent[] }>("/api/admin/parents"),
       ]);
       setStudents(Array.isArray(studentsRes?.data) ? studentsRes.data : []);
       setParents(Array.isArray(parentsRes?.data) ? parentsRes.data : []);
