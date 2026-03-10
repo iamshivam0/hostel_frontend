@@ -138,12 +138,12 @@ export default function AssignParents() {
       setLoading(true);
       const { api } = await import("@/app/lib/api");
       const [studentsRes, parentsRes] = await Promise.all([
-        api.get<{ data: { _id?: string; id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/students"),
+        api.get<{ data: { _id?: string; id?: string; firstName: string; lastName: string; email: string; roomNumber?: string }[] }>("/api/admin/students"),
         api.get<{ data: { _id?: string; id?: string; firstName: string; lastName: string; email: string }[] }>("/api/admin/parents"),
       ]);
       const studentList = Array.isArray(studentsRes?.data) ? studentsRes.data : [];
       const parentList = Array.isArray(parentsRes?.data) ? parentsRes.data : [];
-      setStudents(studentList.map((s) => ({ ...s, _id: s._id ?? s.id ?? "" })));
+      setStudents(studentList.map((s) => ({ ...s, _id: s._id ?? s.id ?? "", roomNumber: s.roomNumber ?? "" })));
       setParents(parentList.map((p) => ({ ...p, _id: p._id ?? p.id ?? "" })));
     } catch (error) {
       console.error("Error fetching data:", error);

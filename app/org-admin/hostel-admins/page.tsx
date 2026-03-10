@@ -9,7 +9,7 @@ import Pagination from "@/app/components/Pagination";
 import { TableComponent } from "@/components/ui/TableComponent";
 
 /** Staff users only – only staff can be assigned to hostels; org-admin already sees all hostels. */
-interface StaffUser {
+interface StaffUser extends Record<string, unknown> {
   id: string;
   email: string;
   firstName: string;
