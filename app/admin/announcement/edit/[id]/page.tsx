@@ -4,10 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
-import type { Announcement } from "@/app/types/announcement";
-import { AnnouncementTargetAudience } from "@/app/types/announcement";
+import {
+  AnnouncementTargetAudience,
+  type Announcement,
+  type AnnouncementTargetAudienceType,
+} from "@/app/types/announcement";
 
-const TARGET_AUDIENCE_OPTIONS: { value: string; label: string }[] = [
+const TARGET_AUDIENCE_OPTIONS: { value: AnnouncementTargetAudienceType; label: string }[] = [
   { value: AnnouncementTargetAudience.ALL, label: "All" },
   { value: AnnouncementTargetAudience.STUDENTS, label: "Students only" },
   { value: AnnouncementTargetAudience.STAFF, label: "Staff only" },
@@ -23,7 +26,11 @@ export default function EditAnnouncementPage() {
   const id = params?.id as string | undefined;
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ title: "", content: "", targetAudience: AnnouncementTargetAudience.ALL });
+  const [form, setForm] = useState<{
+    title: string;
+    content: string;
+    targetAudience: AnnouncementTargetAudienceType;
+  }>({ title: "", content: "", targetAudience: AnnouncementTargetAudience.ALL });
 
   const fetchAnnouncement = useCallback(async () => {
     if (!id) return;
@@ -33,7 +40,7 @@ export default function EditAnnouncementPage() {
         setForm({
           title: a.title,
           content: a.content,
-          targetAudience: a.targetAudience || AnnouncementTargetAudience.ALL,
+          targetAudience: (a.targetAudience as AnnouncementTargetAudienceType) || AnnouncementTargetAudience.ALL,
         });
       }
     } catch (e) {
@@ -131,7 +138,7 @@ export default function EditAnnouncementPage() {
               <select
                 value={form.targetAudience}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, targetAudience: e.target.value }))
+                  setForm((f) => ({ ...f, targetAudience: e.target.value as AnnouncementTargetAudienceType }))
                 }
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
