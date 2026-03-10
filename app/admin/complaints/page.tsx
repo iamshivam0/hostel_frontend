@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/providers/theme-provider";
-import { getUser, hasRole } from "@/app/utils/auth";
+import { getUser, hasRole, logout } from "@/app/utils/auth";
 import { User } from "@/app/types/user";
 import { api } from "@/app/lib/api";
 import Pagination from "@/app/components/Pagination";

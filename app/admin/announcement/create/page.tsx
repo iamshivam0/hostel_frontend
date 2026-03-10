@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/app/lib/api";
 import { toast } from "react-hot-toast";
-import { AnnouncementTargetAudience } from "@/app/types/announcement";
+import {
+  AnnouncementTargetAudience,
+  type AnnouncementTargetAudienceType,
+} from "@/app/types/announcement";
 
-const TARGET_AUDIENCE_OPTIONS: { value: string; label: string }[] = [
+const TARGET_AUDIENCE_OPTIONS: { value: AnnouncementTargetAudienceType; label: string }[] = [
   { value: AnnouncementTargetAudience.ALL, label: "All" },
   { value: AnnouncementTargetAudience.STUDENTS, label: "Students only" },
   { value: AnnouncementTargetAudience.STAFF, label: "Staff only" },
@@ -27,7 +30,9 @@ export default function CreateAnnouncement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [targetAudience, setTargetAudience] = useState(AnnouncementTargetAudience.ALL);
+  const [targetAudience, setTargetAudience] = useState<AnnouncementTargetAudienceType>(
+    AnnouncementTargetAudience.ALL
+  );
   const [hostels, setHostels] = useState<HostelOption[]>([]);
   const [hostelIds, setHostelIds] = useState<number[]>([]);
 
@@ -134,7 +139,7 @@ export default function CreateAnnouncement() {
               </label>
               <select
                 value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
+                onChange={(e) => setTargetAudience(e.target.value as AnnouncementTargetAudienceType)}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 {TARGET_AUDIENCE_OPTIONS.map((opt) => (

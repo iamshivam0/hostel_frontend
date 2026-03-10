@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Actions, type TableAction } from "./Actions";
+export type { TableAction } from "./Actions";
 import "./table.css";
 
 function formatHeading(heading: string): string {
@@ -27,7 +28,7 @@ export interface TableComponentOptions {
   isRowClickable?: boolean;
 }
 
-export interface TableComponentProps<T extends Record<string, unknown>> {
+export interface TableComponentProps<T extends object> {
   headings: (keyof T & string)[];
   data: T[] | null;
   idKey: keyof T & string;
@@ -44,7 +45,7 @@ export interface TableComponentProps<T extends Record<string, unknown>> {
   renderCell?: (heading: string, value: unknown, row: T) => React.ReactNode | null;
 }
 
-export function TableComponent<T extends Record<string, unknown>>({
+export function TableComponent<T extends object>({
   headings,
   data,
   idKey,

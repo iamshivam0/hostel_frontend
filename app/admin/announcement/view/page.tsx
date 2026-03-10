@@ -63,7 +63,7 @@ export default function ViewAnnouncements() {
   }, []);
 
   const handleDelete = useCallback(
-    async (actionId: string, row: Announcement & Record<string, unknown>) => {
+    async (actionId: string, row: Announcement & { createdByDisplay?: string }) => {
       if (actionId !== "delete") return;
       if (!window.confirm("Are you sure you want to delete this announcement?")) return;
       try {
@@ -78,7 +78,7 @@ export default function ViewAnnouncements() {
   );
 
   const handleEdit = useCallback(
-    (actionId: string, row: Announcement & Record<string, unknown>) => {
+    (actionId: string, row: Announcement & { createdByDisplay?: string }) => {
       if (actionId === "edit") router.push(`/admin/announcement/edit/${row.id}`);
     },
     [router]
